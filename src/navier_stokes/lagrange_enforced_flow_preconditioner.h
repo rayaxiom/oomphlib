@@ -2174,15 +2174,38 @@ void LagrangeEnforcedflowPreconditioner::setup()
 
 
     // Tell the LSC preconditioner which DOF type should be treated as one
-    // dof type. i.e.
-    // 0   0  2  4
-    // u = ub up ut
+    // These DOF types are local to the LSC preconditioner.
+    // For example, for the artificial test data:
+    // 
+    // ub vb wb p up vp wp Lp1 Lp2 ut vt wt Lt
+    // 0  1  2  3 4  5  6  7   8   9  10 11  12 DOF type order.
     //
-    // 1   1  3  5
-    // v = vb vp vt
+    // Assume that we gave this list to turn_into_subsidiary:
+    // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 MARK1 (see below)
+    // ub vb wb up vp wp ut vt wt p
+    // 0  1  2  4  5  6  9  10 11 3 turn_into_sub list.
     //
-    // 2   6
-    // p = p
+    // What the turn_into_sub list says is: your dof type
+    // 0 is my dof type 0
+    // 1 is my dof type 1
+    // 2 is my dof type 2
+    // 3 is my dof type 4 (we've skipped a pressure).
+    // etc....
+    // your dof type 9 is my dof type 3 (for the pressure)
+    //
+    // NOW: We have to tell the LSC preconditioner which dof types to
+    // treat as one. The LSC preconditioner 
+    // expects 2 or 3 velocity dof types, and one pressure DOF types.
+    // We give it this list (Look at the list MARK1):
+    // u [0, 3, 6]
+    // v [1, 4, 7]
+    // w [2, 5, 8]
+    // p [9]
+    //
+    // Artificial test data:
+//    spatial_dim = 3;
+//    My_nmesh = 3;
+
     Vector<Vector<unsigned> > subsidiary_dof_type_coarsening_map;
 
     for (unsigned direction = 0; direction < spatial_dim; direction++)
@@ -2198,19 +2221,25 @@ void LagrangeEnforcedflowPreconditioner::setup()
     }
 
     Vector<unsigned> ns_p_vec(1,0);
-    ns_p_vec[0] = N_velocity_doftypes;
+    // This is simply the number of velocity dof types,
+    // But we work it out anyway so the artificial test data is used.
+    ns_p_vec[0] = My_nmesh*spatial_dim; 
 
     subsidiary_dof_type_coarsening_map.push_back(ns_p_vec);
 
-//      std::cout << "Lgr: sub dof type coarsening map: " << std::endl; 
-//      for (unsigned i = 0; i < subsidiary_dof_type_coarsening_map.size(); i++) 
+//    std::cout << "Lgr: sub dof type coarsening map: " << std::endl; 
+//    for (unsigned i = 0; 
+//        i < subsidiary_dof_type_coarsening_map.size(); i++) 
+//    {
+//      for (unsigned j = 0; 
+//          j < subsidiary_dof_type_coarsening_map[i].size(); j++) 
 //      {
-//        for (unsigned j = 0; j < subsidiary_dof_type_coarsening_map[i].size(); j++) 
-//        {
-//          std::cout << subsidiary_dof_type_coarsening_map[i][j] << " ";
-//        }
-//        std::cout << "\n"; 
+//        std::cout << subsidiary_dof_type_coarsening_map[i][j] << " ";
 //      }
+//      std::cout << "\n"; 
+//    }
+//    pause("Outputted the dof type coarsen map."); 
+    
       
 
     //    Doftype_coarsen_map_fine.resize(0,0);
