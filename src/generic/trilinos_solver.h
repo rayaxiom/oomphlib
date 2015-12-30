@@ -506,7 +506,7 @@ class TrilinosAztecOOSolver : public IterativeLinearSolver
  /// Stores set up time for Jacobian
  double Jacobian_setup_time;
 
- /// Stores time for the solution (excludes time to set up preconditioner)
+ /// Stores time for the solution (INCLUDES time to set up preconditioner)
  double Linear_solver_solution_time;
 
  /// \short Trilinos copies matrix data from oomph-lib's own CRDoubleMatrix

@@ -255,15 +255,27 @@ void TrilinosAztecOOSolver::solve(DoubleMatrixBase* const& matrix_pt,
 
  // stop timers and compute solve time
  double end_t = TimingHelpers::timer();
- Linear_solver_solution_time = end_t-start_t;
+ // RAYRAY - Here I am taking the trilinos solve itself as the linear solver
+ // time.
+ // Linear_solver_solution_time = end_t-start_t;
+ Linear_solver_solution_time = end_t_trilinos-start_t_trilinos;
+
 
  // output timings and info
  if (this->Doc_time)
  {
   oomph_info << "RAYRAY5 Time for complete trilinos solve                  : "
-             << Linear_solver_solution_time
+             << (end_t - start_t)
              << "s" << std::endl;
  }
+
+// // output timings and info
+// if (this->Doc_time)
+// {
+//  oomph_info << "RAYRAY5 Time for complete trilinos solve                  : "
+//             << Linear_solver_solution_time
+//             << "s" << std::endl;
+// }
 }
 
 
