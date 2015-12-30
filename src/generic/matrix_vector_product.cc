@@ -92,7 +92,7 @@ namespace oomph
      TrilinosEpetraHelpers::create_distributed_epetra_matrix
      (matrix_pt,Column_distribution_pt);
     double t_end = TimingHelpers::timer();
-    oomph_info << "Time to build epetra matrix [sec] : "
+    oomph_info << "RAYRAY6 Time to build epetra matrix [sec] : "
                << t_end - t_start << std::endl;
 #endif
    }

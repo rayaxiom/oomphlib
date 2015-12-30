@@ -151,7 +151,7 @@ namespace oomph
   bool doc_block_matrices=false;
 
   // For output timing results - to be removed soon. Ray
-  bool raytime_flag = false;
+  bool raytime_flag = true;
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // NOTE: In the interest of minimising memory usage, several containers
