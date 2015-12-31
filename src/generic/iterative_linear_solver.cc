@@ -1458,7 +1458,7 @@ void GMRES<MATRIX>::solve(Problem* const &problem_pt, DoubleVector &result)
 
  if(Doc_time)
   {
-   oomph_info << "Time for setup of Jacobian [sec]: "
+   oomph_info << "OGMRES0 Time for setup of Jacobian [sec]: "
               << Jacobian_setup_time << std::endl;
   }
 
