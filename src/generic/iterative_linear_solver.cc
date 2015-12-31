@@ -1614,7 +1614,7 @@ void GMRES<MATRIX>::solve_helper(DoubleMatrixBase* const &matrix_pt,
      
      if(Doc_time)
       {
-       oomph_info << "Time for setup of preconditioner  [sec]: "
+       oomph_info << "OGMRES1: Time for setup of preconditioner  [sec]: "
                   << Preconditioner_setup_time << std::endl;     
       }
     }
@@ -1683,7 +1683,7 @@ void GMRES<MATRIX>::solve_helper(DoubleMatrixBase* const &matrix_pt,
 
    if(Doc_time)
     {
-     oomph_info << "Time for solve with GMRES  [sec]: "
+     oomph_info << "OGMRES2 Time for solve with GMRES  [sec]: "
                 << Solution_time << std::endl;
     }
    return;
@@ -1841,7 +1841,7 @@ void GMRES<MATRIX>::solve_helper(DoubleMatrixBase* const &matrix_pt,
 
        if(Doc_time)
         {
-         oomph_info << "Time for solve with GMRES  [sec]: "
+         oomph_info << "OGMRES3 Time for solve with GMRES  [sec]: "
                     << Solution_time << std::endl;
         }
        return;
@@ -1899,7 +1899,7 @@ void GMRES<MATRIX>::solve_helper(DoubleMatrixBase* const &matrix_pt,
 
      if(Doc_time)
       {
-       oomph_info << "Time for solve with GMRES  [sec]: "
+       oomph_info << "OGMRES4 Time for solve with GMRES  [sec]: "
                   << Solution_time << std::endl;
       }
      return;
