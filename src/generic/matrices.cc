@@ -5219,7 +5219,7 @@ namespace CRDoubleMatrixHelpers
   double RRR4start = TimingHelpers::timer();
   // determine nnz of all blocks on this processor only.
   // This is used to create storage space.
-  unsigned res_nnz = 0;
+  unsigned long res_nnz = 0;
   for (unsigned row_i = 0; row_i < nblock_row; row_i++) 
    {
     for (unsigned col_i = 0; col_i < nblock_col; col_i++) 
@@ -5245,8 +5245,8 @@ namespace CRDoubleMatrixHelpers
   res_row_start[0] = 0;
     
   // loop over the block rows
-  unsigned res_i = 0; // index for the result matrix.
-  unsigned res_row_i = 0; // index for the row
+  unsigned long res_i = 0; // index for the result matrix.
+  unsigned long res_row_i = 0; // index for the row
   for (unsigned i = 0; i < nblock_row; i++) 
    {
     // loop over the rows of the current block local rows.
@@ -5286,7 +5286,7 @@ namespace CRDoubleMatrixHelpers
 
             // determine the local equation number in the block j/processor p
             // "column block"
-            unsigned eqn = b_column_index[l]-b_first_row;
+            unsigned long eqn = b_column_index[l]-b_first_row;
 
             // add to the result matrix
             res_value[res_i] = b_value[l];
