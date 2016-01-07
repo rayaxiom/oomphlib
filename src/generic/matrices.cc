@@ -5047,13 +5047,20 @@ namespace CRDoubleMatrixHelpers
   // the sub matrix distributions.
   if(!result_matrix.distribution_pt()->built())
    {
+    double RRR1start = TimingHelpers::timer();
     // The result distribution
     LinearAlgebraDistribution tmp_distribution;
-
     LinearAlgebraDistributionHelpers::concatenate(row_distribution_pt,
                                                   tmp_distribution);
-
+    double RRR1end = TimingHelpers::timer();
+    double RRR1diff = RRR1end - RRR1start;
+    oomph_info << "RRR1 concat lin dist: " << RRR1diff << std::endl; 
+    
+    double RRR2start = TimingHelpers::timer();
     result_matrix.build(&tmp_distribution);
+    double RRR2end = TimingHelpers::timer();
+    double RRR2diff = RRR2end - RRR2start;
+    oomph_info << "RRR2 build mat: " << RRR2diff << std::endl; 
    }
   else
    // A distribution is supplied for the result matrix.
@@ -5205,6 +5212,7 @@ namespace CRDoubleMatrixHelpers
   // renamed for readability.
   unsigned nblock_col = matrix_ncol;
 
+  double RRR3start = TimingHelpers::timer();
   // construct the block offset
   DenseMatrix<unsigned> col_offset(nproc,nblock_col,0);
   unsigned off = 0;
@@ -5216,7 +5224,11 @@ namespace CRDoubleMatrixHelpers
       off +=col_distribution_pt[block_i]->nrow_local(proc_i);
      }
    }
-
+  double RRR3end = TimingHelpers::timer();
+  double RRR3diff = RRR3end-RRR3start;
+  oomph_info << "RRR3 construct col_offset: " << RRR3diff << std::endl; 
+  
+  double RRR4start = TimingHelpers::timer();
   // determine nnz of all blocks on this processor only.
   // This is used to create storage space.
   unsigned res_nnz = 0;
@@ -5230,7 +5242,12 @@ namespace CRDoubleMatrixHelpers
        }
      }
    }
+  double RRR4end = TimingHelpers::timer();
+  double RRR4diff = RRR4end-RRR4start;
+  oomph_info << "RRR4 calc nnz: " << RRR4diff << std::endl; 
 
+
+  double RRR5start = TimingHelpers::timer();
   // storage for the result matrix.
   int* res_row_start = new int[res_nrow_local+1];
   int* res_column_index = new int[res_nnz];
@@ -5297,19 +5314,33 @@ namespace CRDoubleMatrixHelpers
 
      }
    }
+  double RRR5end = TimingHelpers::timer();
+  double RRR5diff = RRR5end-RRR5start;
+  oomph_info << "RRR5 done the values: " << RRR5diff << std::endl; 
 
+
+
+  double RRR6start = TimingHelpers::timer();
   // Get the number of columns of the result matrix.
   unsigned res_ncol = 0;
   for (unsigned block_col_i = 0; block_col_i < matrix_ncol; block_col_i++) 
   {
     res_ncol += col_distribution_pt[block_col_i]->nrow();
   }
-  
+  double RRR6end = TimingHelpers::timer();
+  double RRR6diff = RRR6end-RRR6start;
+  oomph_info << "RRR6 get no. cols took: " << RRR6diff << std::endl; 
+
+  double RRR7start = TimingHelpers::timer();
   // Build the result matrix.
   result_matrix.build_without_copy(res_ncol,res_nnz,
                                    res_value,
                                    res_column_index,
                                    res_row_start);
+  double RRR7end = TimingHelpers::timer();
+  double RRR7diff = RRR7end-RRR7start;
+  oomph_info << "RRR7 built the matrix: " << RRR7diff << std::endl; 
+
  }
 
 
