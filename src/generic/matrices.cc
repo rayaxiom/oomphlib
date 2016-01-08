@@ -4727,7 +4727,8 @@ namespace CRDoubleMatrixHelpers
   const Vector<LinearAlgebraDistribution*> &row_distribution_pt,
   const Vector<LinearAlgebraDistribution*> &col_distribution_pt,
   const DenseMatrix<CRDoubleMatrix*> &matrix_pt,
-  CRDoubleMatrix &result_matrix)
+  CRDoubleMatrix &result_matrix,
+  bool debug_flag)
  {
   // The number of block rows and block columns.
   unsigned matrix_nrow = matrix_pt.nrow();
@@ -5053,14 +5054,20 @@ namespace CRDoubleMatrixHelpers
     LinearAlgebraDistributionHelpers::concatenate(row_distribution_pt,
                                                   tmp_distribution);
     double RRR1end = TimingHelpers::timer();
+    if(debug_flag)
+    {
     double RRR1diff = RRR1end - RRR1start;
     oomph_info << "RRR1 concat lin dist: " << RRR1diff << std::endl; 
+    }
     
     double RRR2start = TimingHelpers::timer();
     result_matrix.build(&tmp_distribution);
     double RRR2end = TimingHelpers::timer();
-    double RRR2diff = RRR2end - RRR2start;
-    oomph_info << "RRR2 build mat: " << RRR2diff << std::endl; 
+    if(debug_flag)
+    {
+      double RRR2diff = RRR2end - RRR2start;
+      oomph_info << "RRR2 build mat: " << RRR2diff << std::endl; 
+    }
    }
   else
    // A distribution is supplied for the result matrix.
@@ -5225,9 +5232,12 @@ namespace CRDoubleMatrixHelpers
      }
    }
   double RRR3end = TimingHelpers::timer();
-  double RRR3diff = RRR3end-RRR3start;
-  oomph_info << "RRR3 construct col_offset: " << RRR3diff << std::endl; 
-  
+  if(debug_flag)
+  {
+    double RRR3diff = RRR3end-RRR3start;
+    oomph_info << "RRR3 construct col_offset: " << RRR3diff << std::endl; 
+  }
+
   double RRR4start = TimingHelpers::timer();
   // determine nnz of all blocks on this processor only.
   // This is used to create storage space.
@@ -5243,9 +5253,11 @@ namespace CRDoubleMatrixHelpers
      }
    }
   double RRR4end = TimingHelpers::timer();
-  double RRR4diff = RRR4end-RRR4start;
-  oomph_info << "RRR4 calc nnz: " << RRR4diff << std::endl; 
-
+  if(debug_flag)
+  {
+    double RRR4diff = RRR4end-RRR4start;
+    oomph_info << "RRR4 calc nnz: " << RRR4diff << std::endl; 
+  }
 
   double RRR5start = TimingHelpers::timer();
   // storage for the result matrix.
@@ -5315,10 +5327,11 @@ namespace CRDoubleMatrixHelpers
      }
    }
   double RRR5end = TimingHelpers::timer();
-  double RRR5diff = RRR5end-RRR5start;
-  oomph_info << "RRR5 done the values: " << RRR5diff << std::endl; 
-
-
+  if(debug_flag)
+  {
+    double RRR5diff = RRR5end-RRR5start;
+    oomph_info << "RRR5 done the values: " << RRR5diff << std::endl; 
+  }
 
   double RRR6start = TimingHelpers::timer();
   // Get the number of columns of the result matrix.
@@ -5328,8 +5341,11 @@ namespace CRDoubleMatrixHelpers
     res_ncol += col_distribution_pt[block_col_i]->nrow();
   }
   double RRR6end = TimingHelpers::timer();
-  double RRR6diff = RRR6end-RRR6start;
-  oomph_info << "RRR6 get no. cols took: " << RRR6diff << std::endl; 
+  if(debug_flag)
+  {
+    double RRR6diff = RRR6end-RRR6start;
+    oomph_info << "RRR6 get no. cols took: " << RRR6diff << std::endl; 
+  }
 
   double RRR7start = TimingHelpers::timer();
   // Build the result matrix.
@@ -5338,9 +5354,11 @@ namespace CRDoubleMatrixHelpers
                                    res_column_index,
                                    res_row_start);
   double RRR7end = TimingHelpers::timer();
-  double RRR7diff = RRR7end-RRR7start;
-  oomph_info << "RRR7 built the matrix: " << RRR7diff << std::endl; 
-
+  if(debug_flag)
+  {
+    double RRR7diff = RRR7end-RRR7start;
+    oomph_info << "RRR7 built the matrix: " << RRR7diff << std::endl; 
+  }
  }
 
 
@@ -5354,7 +5372,8 @@ namespace CRDoubleMatrixHelpers
  void concatenate_without_communication(
   const Vector<LinearAlgebraDistribution*> &block_distribution_pt,
   const DenseMatrix<CRDoubleMatrix*> &matrix_pt,
-  CRDoubleMatrix &result_matrix)
+  CRDoubleMatrix &result_matrix,
+  bool debug_flag)
  {
  
 #ifdef PARANOID
@@ -5388,7 +5407,8 @@ namespace CRDoubleMatrixHelpers
 #endif
   
   concatenate_without_communication(
-   block_distribution_pt,block_distribution_pt,matrix_pt,result_matrix);
+   block_distribution_pt,block_distribution_pt,matrix_pt,result_matrix,
+   debug_flag);
  }
 
 } // CRDoubleMatrixHelpers
