@@ -1881,7 +1881,7 @@ class BlockSelector
       // find the processor which this global index in block belongs to.
       unsigned block_proc 
         = internal_block_distribution_pt(internal_dof_block_number)
-        ->rank_of_global_row(internal_index_in_dof);
+        ->rank_of_global_row_map(internal_index_in_dof);
 
       // Add up all of the first rows.
       const unsigned ndof_in_block 
