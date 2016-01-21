@@ -390,7 +390,7 @@ class LinearAlgebraDistribution
   }
 
  /// \short return the processor rank of the global row number i 
- unsigned rank_of_global_row(const unsigned i) const
+ unsigned rank_of_global_row(const unsigned& i) const
   {
    unsigned p = 0;
    while (i < first_row(p) || i >= first_row(p)+nrow_local(p))
@@ -412,6 +412,11 @@ class LinearAlgebraDistribution
    return First_row;
   }
 
+ unsigned rank_of_global_row_map(const unsigned& i) const
+ {
+   return Rank_of_global_row_map[i];
+ }
+
   private:
  
  /// the number of global rows
@@ -422,6 +427,9 @@ class LinearAlgebraDistribution
  
  /// the first row on this processor
  Vector<unsigned> First_row;
+
+ /// the rank of global row map
+ Vector<unsigned> Rank_of_global_row_map;
   
  /// flag to indicate whether this distribution describes an object that is
  /// distributed over the processors of Comm_pt (true) or duplicated over the

@@ -157,6 +157,30 @@ namespace oomph
    }
 #endif
 #endif
+
+  // Now we build the Rank_of_global_row_map vector
+#ifdef OOMPH_HAS_MPI
+  if (Distributed)
+  {
+    Rank_of_global_row_map.resize(Nrow, 0);
+    // Fill in the Rank_of_global_row_map vector.
+    for (unsigned long i = 0; i < Nrow; i++) 
+    {
+      unsigned p = 0;
+      while (i < First_row[p] || i >= First_row[p]+Nrow_local[p])
+      {
+        p++;
+      }
+      Rank_of_global_row_map[i] = p;
+    }
+  }
+  else
+  {
+    Rank_of_global_row_map.assign(Nrow,0);
+  }
+#else
+  Rank_of_global_row_map.assign(Nrow,0);
+#endif
  }
  
  //============================================================================
@@ -212,6 +236,30 @@ namespace oomph
      First_row[nproc-1];         
    }
 #endif
+  // Now we build the Rank_of_global_row_map vector
+#ifdef OOMPH_HAS_MPI
+  if (Distributed)
+  {
+    Rank_of_global_row_map.resize(Nrow, 0);
+    // Fill in the Rank_of_global_row_map vector.
+    for (unsigned long i = 0; i < Nrow; i++) 
+    {
+      unsigned p = 0;
+      while (i < First_row[p] || i >= First_row[p]+Nrow_local[p])
+      {
+        p++;
+      }
+      Rank_of_global_row_map[i] = p;
+    }
+  }
+  else
+  {
+    Rank_of_global_row_map.assign(Nrow,0);
+  }
+#else
+  Rank_of_global_row_map.assign(Nrow,0);
+#endif
+
  }
 
  //============================================================================
@@ -254,6 +302,30 @@ namespace oomph
       }
      Nrow = new_dist.nrow();
     }
+  // Now we build the Rank_of_global_row_map vector
+#ifdef OOMPH_HAS_MPI
+  if (Distributed)
+  {
+    Rank_of_global_row_map.resize(Nrow, 0);
+    // Fill in the Rank_of_global_row_map vector.
+    for (unsigned long i = 0; i < Nrow; i++) 
+    {
+      unsigned p = 0;
+      while (i < First_row[p] || i >= First_row[p]+Nrow_local[p])
+      {
+        p++;
+      }
+      Rank_of_global_row_map[i] = p;
+    }
+  }
+  else
+  {
+    Rank_of_global_row_map.assign(Nrow,0);
+  }
+#else
+  Rank_of_global_row_map.assign(Nrow,0);
+#endif
+
   }
 
 

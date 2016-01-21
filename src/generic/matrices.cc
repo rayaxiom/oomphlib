@@ -5284,17 +5284,18 @@ namespace CRDoubleMatrixHelpers
            {
             // if b_column_index[l] was a row index, what processor
             // would it be on
-            unsigned p = 0;
-            int b_first_row = col_distribution_pt[j]->first_row(0);
-            int b_nrow_local = col_distribution_pt[j]->nrow_local(0);
+            unsigned p = col_distribution_pt[j]
+              ->rank_of_global_row_map(b_column_index[l]);
+            int b_first_row = col_distribution_pt[j]->first_row(p);
+//            int b_nrow_local = col_distribution_pt[j]->nrow_local(p);
 
-            while (b_column_index[l] < b_first_row || 
-                   b_column_index[l] >= b_nrow_local+b_first_row)
-             {
-              p++;
-              b_first_row = col_distribution_pt[j]->first_row(p);
-              b_nrow_local = col_distribution_pt[j]->nrow_local(p);
-             }
+//            while (b_column_index[l] < b_first_row || 
+//                   b_column_index[l] >= b_nrow_local+b_first_row)
+//             {
+//              p++;
+//              b_first_row = col_distribution_pt[j]->first_row(p);
+//              b_nrow_local = col_distribution_pt[j]->nrow_local(p);
+//             }
 
             // determine the local equation number in the block j/processor p
             // "column block"
