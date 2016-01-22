@@ -5221,13 +5221,16 @@ namespace CRDoubleMatrixHelpers
 
   double RRR3start = TimingHelpers::timer();
   // construct the block offset
-  DenseMatrix<unsigned> col_offset(nproc,nblock_col,0);
+//  DenseMatrix<unsigned> col_offset(nproc,nblock_col,0);
+  std::vector<std::vector<unsigned> > col_offset(
+      nproc,
+      std::vector<unsigned>(nblock_col));
   unsigned off = 0;
   for (unsigned proc_i = 0; proc_i < nproc; proc_i++) 
    {
     for (unsigned block_i = 0; block_i < nblock_col; block_i++) 
      {
-      col_offset(proc_i,block_i) = off;
+      col_offset[proc_i][block_i] = off;
       off +=col_distribution_pt[block_i]->nrow_local(proc_i);
      }
    }
@@ -5311,11 +5314,11 @@ namespace CRDoubleMatrixHelpers
 
             // determine the local equation number in the block j/processor p
             // "column block"
-            unsigned long eqn = b_column_index[l]-b_first_row;
+            int eqn = b_column_index[l]-b_first_row;
 
             // add to the result matrix
             res_value[res_i] = b_value[l];
-            res_column_index[res_i] = col_offset(p,j)+eqn;
+            res_column_index[res_i] = col_offset[p][j]+eqn;
             res_row_start[res_row_i+1]++;
             res_i++;
            }
