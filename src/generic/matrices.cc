@@ -5282,6 +5282,10 @@ namespace CRDoubleMatrixHelpers
           int* b_column_index = matrix_pt(i,j)->column_index();
           double* b_value = matrix_pt(i,j)->value();
 
+          //memcpy( &dst[dstIdx], &src[srcIdx], numElementsToCopy * sizeof( Element ) );
+          // no ele to copy
+          int numEleToCopy = b_row_start[k+1] - b_row_start[k];
+          memcpy(res_value+res_i,b_value+b_row_start[k],numEleToCopy*sizeof(double));
           // Loop through the current local row.
           for (int l = b_row_start[k]; l < b_row_start[k+1]; l++)
            {
@@ -5290,15 +5294,6 @@ namespace CRDoubleMatrixHelpers
             unsigned p = col_distribution_pt[j]
               ->rank_of_global_row_map(b_column_index[l]);
             int b_first_row = col_distribution_pt[j]->first_row(p);
-//            int b_nrow_local = col_distribution_pt[j]->nrow_local(p);
-
-//            while (b_column_index[l] < b_first_row || 
-//                   b_column_index[l] >= b_nrow_local+b_first_row)
-//             {
-//              p++;
-//              b_first_row = col_distribution_pt[j]->first_row(p);
-//              b_nrow_local = col_distribution_pt[j]->nrow_local(p);
-//             }
 
             // determine the local equation number in the block j/processor p
             // "column block"
@@ -5306,8 +5301,8 @@ namespace CRDoubleMatrixHelpers
 
             // add to the result matrix
 //            res_value[res_i] = b_value[l];
-//            res_column_index[res_i] = col_offset[p][j]+eqn;
-//            res_row_start[res_row_i+1]++;
+            res_column_index[res_i] = col_offset[p][j]+eqn;
+            res_row_start[res_row_i+1]++;
             res_i++;
            }
          }
