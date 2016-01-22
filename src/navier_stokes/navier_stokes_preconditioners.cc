@@ -673,6 +673,7 @@ namespace oomph
  void NavierStokesSchurComplementPreconditioner:: 
  preconditioner_solve(const DoubleVector &r, DoubleVector &z)
  {
+   double t_lscsolve_start = TimingHelpers::timer();
 #ifdef PARANOID
   if (Preconditioner_has_been_setup==false)
    {
@@ -715,7 +716,14 @@ namespace oomph
   // Copy pressure values from residual vector to temp_vec:
   // Loop over all entries in the global vector (this one
   // includes velocity and pressure dofs in some random fashion)
+  double t_get_block_vec_p_start = TimingHelpers::timer();
   this->get_block_vector(1,r,temp_vec);
+  double t_get_block_vec_p_end = TimingHelpers::timer();
+  double t_get_block_vec_p_time = 
+      t_get_block_vec_p_end 
+      - t_get_block_vec_p_start;
+    oomph_info << "LSCSOLVE: get_block_vec_p: " 
+               << t_get_block_vec_p_time << std::endl; 
 
   // NOTE: The vector temp_vec now contains the vector r_p.
 
@@ -737,24 +745,64 @@ namespace oomph
 #endif
     
     // use some Preconditioner's preconditioner_solve function
+    double t_p_prec_solve_start = TimingHelpers::timer();
     P_preconditioner_pt->preconditioner_solve(temp_vec, another_temp_vec);
+    double t_p_prec_solve_finish = TimingHelpers::timer();
+    double t_p_prec_solve_time = 
+      t_p_prec_solve_finish 
+      - t_p_prec_solve_start;
+    oomph_info << "LSCSOLVE: p_prec_solve: " 
+               << t_p_prec_solve_time << std::endl; 
     
     // NOTE: The vector another_temp_vec now contains the vector P^{-1} r_p
     
     // Multiply another_temp_vec by matrix E and stick the result into temp_vec
     temp_vec.clear();  
+    
+    double t_QBt_mat_vec_mult_start = TimingHelpers::timer();
     QBt_mat_vec_pt->multiply(another_temp_vec, temp_vec);
+    double t_QBt_mat_vec_mult_finish = TimingHelpers::timer();
+    double t_QBt_mat_vec_mult_time = 
+      t_QBt_mat_vec_mult_finish 
+      - t_QBt_mat_vec_mult_start;
+    oomph_info << "LSCSOLVE: MATVEC QBt_mat_vec: " 
+               << t_QBt_mat_vec_mult_time << std::endl; 
+    
     another_temp_vec.clear();
+    double t_F_mat_vec_mult_start = TimingHelpers::timer();
     F_mat_vec_pt->multiply(temp_vec,another_temp_vec);
+    double t_F_mat_vec_mult_finish = TimingHelpers::timer();
+    double t_F_mat_vec_mult_time = 
+      t_F_mat_vec_mult_finish 
+      - t_F_mat_vec_mult_start;
+    oomph_info << "LSCSOLVE: MATVEC F_mat_vec: " 
+               << t_F_mat_vec_mult_time << std::endl; 
+
     temp_vec.clear();
+    double t_QBt2_mat_vec_mult_start = TimingHelpers::timer();
     QBt_mat_vec_pt->multiply_transpose(another_temp_vec, temp_vec);
-    
-    
+    double t_QBt2_mat_vec_mult_finish = TimingHelpers::timer();
+    double t_QBt2_mat_vec_mult_time = 
+      t_QBt2_mat_vec_mult_finish 
+      - t_QBt2_mat_vec_mult_start;
+    oomph_info << "LSCSOLVE: MATVEC QBt2_mat_vec: " 
+               << t_QBt2_mat_vec_mult_time << std::endl; 
+
+
+
     // NOTE: The vector temp_vec now contains E P^{-1} r_p
     
     // Solve second pressure Poisson system using preconditioner_solve
     another_temp_vec.clear();
+
+    double t_p_prec_solve2_start = TimingHelpers::timer();
     P_preconditioner_pt->preconditioner_solve(temp_vec, another_temp_vec);
+    double t_p_prec_solve2_finish = TimingHelpers::timer();
+    double t_p_prec_solve2_time = 
+      t_p_prec_solve2_finish 
+      - t_p_prec_solve2_start;
+    oomph_info << "LSCSOLVE: p_prec_solve2: " 
+               << t_p_prec_solve2_time << std::endl; 
 
     // NOTE: The vector another_temp_vec now contains z_p = P^{-1} E P^{-1} r_p
     //       as required (apart from the sign which we'll fix in the
@@ -800,8 +848,15 @@ namespace oomph
   // Loop over all entries in the global results vector z:
   temp_vec.build(another_temp_vec.distribution_pt(),0.0);
   temp_vec -= another_temp_vec;
+  
+  double t_return_p_vec_start = TimingHelpers::timer();
   return_block_vector(1,temp_vec,z);
-
+  double t_return_p_vec_finish = TimingHelpers::timer();
+  double t_return_p_vec_time = 
+      t_return_p_vec_finish 
+      - t_return_p_vec_start;
+    oomph_info << "LSCSOLVE: return_p_vec: " 
+               << t_return_p_vec_time << std::endl; 
     
   // Step 2 - apply preconditioner to velocity unknowns (block 0)
   // ------------------------------------------------------------
@@ -811,8 +866,13 @@ namespace oomph
   // Multiply by G (stored in Block_matrix_pt(0,1) and store
   // result in temp_vec (vector resizes itself).
   temp_vec.clear();
+  double t_Bt_mat_vec_mult_start = TimingHelpers::timer();
   Bt_mat_vec_pt->multiply(another_temp_vec, temp_vec);
-
+  double t_Bt_mat_vec_mult_finish = TimingHelpers::timer();
+  double t_Bt_mat_vec_mult_time = 
+      t_Bt_mat_vec_mult_finish - t_Bt_mat_vec_mult_start;
+    oomph_info << "LSCSOLVE: MATVEC Bt_mat_vec: " 
+               << t_Bt_mat_vec_mult_time << std::endl; 
   // NOTE: temp_vec now contains -G z_p
 
   // The vector another_temp_vec is no longer needed -- re-use it to store
@@ -821,7 +881,14 @@ namespace oomph
 
   // Loop over all enries in the global vector and find the
   // entries associated with the velocities:
+  double t_get_block_vec_f_start = TimingHelpers::timer();
   get_block_vector(0,r,another_temp_vec);
+  double t_get_block_vec_f_finish = TimingHelpers::timer();
+  double t_get_block_vec_f_time = 
+      t_get_block_vec_f_finish 
+      - t_get_block_vec_f_start;
+    oomph_info << "LSCSOLVE: get_block_vec_f: " 
+               << t_get_block_vec_f_time << std::endl; 
   another_temp_vec += temp_vec;
  
   // NOTE:  The vector another_temp_vec now contains r_u - G z_p
@@ -849,9 +916,27 @@ namespace oomph
    }
   else
    {
+    double t_F_prec_solve_start = TimingHelpers::timer();
     F_preconditioner_pt->preconditioner_solve(another_temp_vec, temp_vec);
+    double t_F_prec_solve_finish = TimingHelpers::timer();
+    double t_F_prec_solve_time = t_F_prec_solve_finish 
+      - t_F_prec_solve_start;
+    oomph_info << "LSCSOLVE: F_prec_solve: " 
+      << t_F_prec_solve_time << std::endl; 
+    
+    double t_F_return_block_vec_start = TimingHelpers::timer();
     return_block_vector(0,temp_vec,z);
+    double t_F_return_block_vec_end = TimingHelpers::timer();
+    double t_F_return_block_vec_time = t_F_return_block_vec_end
+      - t_F_return_block_vec_start;
+    oomph_info << "LSCSOLVE: F_prec_return_block_vec: " 
+      << t_F_return_block_vec_time << std::endl; 
    }
+
+   double t_lscsolve_finish = TimingHelpers::timer();
+   double t_lscsolve_time = t_lscsolve_finish - t_lscsolve_start;
+   oomph_info << "LSCSOLVE: total: " << t_lscsolve_time << std::endl; 
+   
  }
 
 
