@@ -5305,9 +5305,9 @@ namespace CRDoubleMatrixHelpers
             int eqn = b_column_index[l]-b_first_row;
 
             // add to the result matrix
-            res_value[res_i] = b_value[l];
-            res_column_index[res_i] = col_offset[p][j]+eqn;
-            res_row_start[res_row_i+1]++;
+//            res_value[res_i] = b_value[l];
+//            res_column_index[res_i] = col_offset[p][j]+eqn;
+//            res_row_start[res_row_i+1]++;
             res_i++;
            }
          }
