@@ -566,6 +566,7 @@ void TrilinosAztecOOSolver::resolve(const DoubleVector &rhs,
  Epetra_Vector* epetra_z_pt = TrilinosEpetraHelpers::
   create_distributed_epetra_vector(solution);
 
+// oomph_info << "RAYRAY DOING TRILINOS AZTECOO RESOLVE" << std::endl; 
  // solve the system
  solve_using_AztecOO(epetra_r_pt,epetra_z_pt);
 

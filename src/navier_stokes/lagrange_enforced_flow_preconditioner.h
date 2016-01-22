@@ -275,20 +275,8 @@ class LagrangeEnforcedflowPreconditioner
   /// r is the residual (rhs), z will contain the solution.
   void preconditioner_solve(const DoubleVector& r, DoubleVector& z)
   {
-    // Counter for the current linear solver iteration.
-    // This is used when dumping the rhs block vector,
-    // we only want the first Newton Step.
-    if(Doc_prec && First_NS_solve)
-    {
-      std::string currentsetting 
-        = *Label_pt + "NS"
-        + StringConversion::to_string(Doc_linear_solver_info_pt
-            ->current_nnewton_step());
-      // Dump out the block rhs if  it is the first Newton Iteration.
-      DoubleVector x; // Will contain the re-ordered rhs
-      this->get_block_ordered_preconditioner_vector(r,x);
-      x.output( *Doc_prec_directory_pt + "/rhsx_" + currentsetting,15);
-    }
+
+    double t_lgrsolve_start = TimingHelpers::timer();
 
     // Working vectors.
     DoubleVector temp_vec;
@@ -305,25 +293,46 @@ class LagrangeEnforcedflowPreconditioner
     }
     else
     {
+
       // Loop through all of the Lagrange multipliers
       for(unsigned l_i = 0; l_i < N_lagrange_doftypes; l_i++)
       {
         // Get the block type of block l_i
         const unsigned l_ii = N_fluid_doftypes + l_i;
 
+        double t_w_get_block_vec_start = TimingHelpers::timer();
         // Extract the block
         this->get_block_vector(l_ii,r,temp_vec);
+        double t_w_get_block_vec_finish = TimingHelpers::timer();
+        double t_w_get_block_vec_time = t_w_get_block_vec_finish-
+          t_w_get_block_vec_start;
+        oomph_info << "LGRSOLVE: get_block_vector w" << l_i << ": " 
+          <<  t_w_get_block_vec_time<< std::endl; 
+        
+
+        double t_w_solve_start = TimingHelpers::timer();
         Lagrange_multiplier_preconditioner_pt[l_i]
           ->preconditioner_solve(temp_vec,another_temp_vec);
+        double t_w_solve_finish = TimingHelpers::timer();
+        double t_w_solve_time = t_w_solve_finish - t_w_solve_start;
+        oomph_info << "LGRSOLVE: solve w" << l_i << ": " 
+          <<  t_w_solve_time<< std::endl; 
 
         const unsigned vec_nrow_local = another_temp_vec.nrow_local();
         double* vec_values_pt = another_temp_vec.values_pt();
+        
         for (unsigned i = 0; i < vec_nrow_local; i++) 
         {
           vec_values_pt[i] = vec_values_pt[i]*Scaling_sigma;
         }
-
+        double t_w_return_block_vec_start = TimingHelpers::timer();
         this->return_block_vector(l_ii,another_temp_vec,z);
+        double t_w_return_block_vec_finish = TimingHelpers::timer();
+        double t_w_return_block_vec_time = t_w_return_block_vec_finish-
+          t_w_return_block_vec_start;
+        oomph_info << "LGRSOLVE: return_block_vector w" << l_i << ": " 
+          << t_w_return_block_vec_time << std::endl; 
+        
         temp_vec.clear();
         another_temp_vec.clear();
       }
@@ -341,7 +350,13 @@ class LagrangeEnforcedflowPreconditioner
         fluid_block_indices[b] = b;
       }
 
+      double t_get_fluid_block_vec_start = TimingHelpers::timer();
       this->get_concatenated_block_vector(fluid_block_indices,r,temp_vec);
+      double t_get_fluid_block_vec_finish = TimingHelpers::timer();
+      double t_get_fluid_block_vector_time = t_get_fluid_block_vec_finish
+        - t_get_fluid_block_vec_start;
+      oomph_info << "LGRSOLVE: get_block_vector f: " 
+                 << t_get_fluid_block_vector_time << std::endl; 
 
       // temp_vec contains the (concatenated) fluid rhs.
       Navier_stokes_preconditioner_pt
@@ -350,8 +365,15 @@ class LagrangeEnforcedflowPreconditioner
       temp_vec.clear();
 
       // Now return it.
+      double t_return_fluid_block_vec_start = TimingHelpers::timer();
       this->return_concatenated_block_vector(fluid_block_indices,
                                              another_temp_vec,z);
+      double t_return_fluid_block_vec_finish = TimingHelpers::timer();
+      double t_return_fluid_block_vector_time = t_return_fluid_block_vec_finish
+        - t_return_fluid_block_vec_start;
+      oomph_info << "LGRSOLVE: return_block_vector f: " 
+                 << t_return_fluid_block_vector_time << std::endl; 
+
       another_temp_vec.clear();
     }
     else
@@ -359,6 +381,11 @@ class LagrangeEnforcedflowPreconditioner
       // This is a BlockPreconditioner
       Navier_stokes_preconditioner_pt->preconditioner_solve(r,z);
     }
+
+    double t_lgrsolve_finish = TimingHelpers::timer();
+    double t_lgrsolve_time = t_lgrsolve_finish - t_lgrsolve_start;
+    oomph_info << "LGRSOLVE: total: " 
+                 << t_lgrsolve_time << std::endl; 
 
     First_NS_solve = false;
   } // end of preconditioner_solve
