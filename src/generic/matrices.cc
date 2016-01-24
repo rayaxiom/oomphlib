@@ -5284,8 +5284,8 @@ namespace CRDoubleMatrixHelpers
 
           //memcpy( &dst[dstIdx], &src[srcIdx], numElementsToCopy * sizeof( Element ) );
           // no ele to copy
-          int numEleToCopy = b_row_start[k+1] - b_row_start[k];
-          memcpy(res_value+res_i,b_value+b_row_start[k],numEleToCopy*sizeof(double));
+//          int numEleToCopy = b_row_start[k+1] - b_row_start[k];
+//          memcpy(res_value+res_i,b_value+b_row_start[k],numEleToCopy*sizeof(double));
           // Loop through the current local row.
           for (int l = b_row_start[k]; l < b_row_start[k+1]; l++)
            {
