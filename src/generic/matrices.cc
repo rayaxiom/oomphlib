@@ -36,6 +36,8 @@
 #include<set> 
 #include<map> 
 
+#include <valgrind/callgrind.h>
+
 //oomph-lib headers
 #include "matrices.h"
 #include "linear_solver.h"
@@ -5263,6 +5265,9 @@ namespace CRDoubleMatrixHelpers
   }
 
   double RRR5start = TimingHelpers::timer();
+
+CALLGRIND_START_INSTRUMENTATION;
+
   // storage for the result matrix.
   int* res_row_start = new int[res_nrow_local+1];
   int* res_column_index = new int[res_nnz];
@@ -5325,6 +5330,10 @@ namespace CRDoubleMatrixHelpers
 
      }
    }
+CALLGRIND_STOP_INSTRUMENTATION;
+CALLGRIND_DUMP_STATS;
+
+
   double RRR5end = TimingHelpers::timer();
   if(debug_flag)
   {
