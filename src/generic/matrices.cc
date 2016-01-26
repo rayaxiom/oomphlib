@@ -5258,7 +5258,7 @@ namespace CRDoubleMatrixHelpers
 
     // Turn the above into a string.
       std::ostringstream myrankstream;
-      myrankstream << "np" << my_rank << std::endl;
+      myrankstream << "THISDOESNOTHINGnp" << my_rank << std::endl;
       std::string myrankstring = myrankstream.str();
 
 
