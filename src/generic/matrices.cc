@@ -5264,8 +5264,19 @@ namespace CRDoubleMatrixHelpers
     oomph_info << "RRR4 calc nnz: " << RRR4diff << std::endl; 
   }
 
+     // My rank
+    unsigned my_rank = comm_pt->my_rank();
+    my_rank = my_rank;
+
+    // Turn the above into a string.
+      std::ostringstream myrankstream;
+      myrankstream << "np" << my_rank << std::endl;
+      std::string myrankstring = myrankstream.str();
+
+
   double RRR5start = TimingHelpers::timer();
 
+CALLGRIND_ZERO_STATS;
 CALLGRIND_START_INSTRUMENTATION;
 
   // storage for the result matrix.
@@ -5331,7 +5342,7 @@ CALLGRIND_START_INSTRUMENTATION;
      }
    }
 CALLGRIND_STOP_INSTRUMENTATION;
-CALLGRIND_DUMP_STATS;
+CALLGRIND_DUMP_STATS_AT(myrankstring.c_str());
 
 
   double RRR5end = TimingHelpers::timer();
