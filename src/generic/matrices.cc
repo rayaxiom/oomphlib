@@ -34,7 +34,7 @@
 #include<set> 
 #include<map> 
 
-#include <valgrind/callgrind.h>
+//#include <valgrind/callgrind.h>
 
 //oomph-lib headers
 #include "matrices.h"
@@ -5257,15 +5257,15 @@ namespace CRDoubleMatrixHelpers
     my_rank = my_rank;
 
     // Turn the above into a string.
-      std::ostringstream myrankstream;
-      myrankstream << "THISDOESNOTHINGnp" << my_rank << std::endl;
-      std::string myrankstring = myrankstream.str();
+//      std::ostringstream myrankstream;
+//      myrankstream << "THISDOESNOTHINGnp" << my_rank << std::endl;
+//      std::string myrankstring = myrankstream.str();
 
 
   double RRR5start = TimingHelpers::timer();
 
-CALLGRIND_ZERO_STATS;
-CALLGRIND_START_INSTRUMENTATION;
+//CALLGRIND_ZERO_STATS;
+//CALLGRIND_START_INSTRUMENTATION;
 
   // storage for the result matrix.
   int* res_row_start = new int[res_nrow_local+1];
@@ -5329,8 +5329,8 @@ CALLGRIND_START_INSTRUMENTATION;
 
      }
    }
-CALLGRIND_STOP_INSTRUMENTATION;
-CALLGRIND_DUMP_STATS_AT(myrankstring.c_str());
+//CALLGRIND_STOP_INSTRUMENTATION;
+//CALLGRIND_DUMP_STATS_AT(myrankstring.c_str());
 
 
   double RRR5end = TimingHelpers::timer();
