@@ -208,22 +208,6 @@ namespace oomph
        }
        
       this->continuous_tangent_and_outer_unit_normal(ipt,tang_vec,norm_vec);
-      oomph_info << "" << std::endl; 
-      
-      oomph_info << "RAYRAYTANGVEC:" << std::endl; 
-      
-      oomph_info << "t11: " << tang_vec[0][0] << std::endl; 
-      oomph_info << "t12: " << tang_vec[0][1] << std::endl; 
-      oomph_info << "t13: " << tang_vec[0][2] << std::endl;
-
-      oomph_info << "t21: " << tang_vec[1][0] << std::endl; 
-      oomph_info << "t22: " << tang_vec[1][1] << std::endl; 
-      oomph_info << "t23: " << tang_vec[1][2] << std::endl; 
-      oomph_info << "" << std::endl; 
-      exit(0);
-      
-
-      
 
       // Assemble residuals and jacobian
 
