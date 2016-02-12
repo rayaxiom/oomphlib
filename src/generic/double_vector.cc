@@ -1214,8 +1214,10 @@ namespace oomph
          // processors and does two unsigned comparisons. Since we have to do
          // this for every row, it may be better to store a list mapping for
          // very large number of processors.
+//         unsigned out_p = out_distribution_pt
+//          ->rank_of_global_row(out_global_eqn);
          unsigned out_p = out_distribution_pt
-          ->rank_of_global_row(out_global_eqn);
+           ->rank_of_global_row_map(out_global_eqn);
 
          // Knowing out_p enables us to work out the out_first_row and
          // out_local_eqn.
