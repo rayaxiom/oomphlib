@@ -356,7 +356,8 @@ namespace DoubleVectorHelpers
  /// with a distribution, otherwise we can let the function generate the
  /// out vector distribution itself. 
  void concatenate(const Vector<DoubleVector*> &in_vector_pt,
-                  DoubleVector &out_vector);
+                  DoubleVector &out_vector,
+                  bool debug_flag = false);
 
  /// \short Wrapper around the other concatenate(...) function.
  /// Be careful with Vector of vectors. If the DoubleVectors are resized,
@@ -371,7 +372,8 @@ namespace DoubleVectorHelpers
  /// pointers which will delete themselves, so we do not have to remember 
  /// to delete!
  void concatenate(Vector<DoubleVector> &in_vector,
-                  DoubleVector &out_vector);
+                  DoubleVector &out_vector,
+                  bool debug_flag = false);
 
  /// \short Split a DoubleVector into the out DoubleVectors.
  /// Let vec_A be the in Vector, and let vec_B and vec_C be the out vectors.
