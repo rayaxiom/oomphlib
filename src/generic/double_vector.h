@@ -392,7 +392,8 @@ namespace DoubleVectorHelpers
  /// row of the out vectors must be the same the the number of global rows of
  /// the in vector.
  void split(const DoubleVector &in_vector, 
-            Vector<DoubleVector*> &out_vector_pt);
+            Vector<DoubleVector*> &out_vector_pt,
+            bool debug_flag = false);
 
  /// \short Wrapper around the other split(...) function.
  /// Be careful with Vector of vectors. If the DoubleVectors are resized,
@@ -407,7 +408,8 @@ namespace DoubleVectorHelpers
  /// pointers which will delete themselves, so we do not have to remember 
  /// to delete!
  void split(const DoubleVector &in_vector, 
-            Vector<DoubleVector> &out_vector);
+            Vector<DoubleVector> &out_vector,
+            bool debug_flag = false);
 
  /// \short Concatenate DoubleVectors.
  /// Takes a Vector of DoubleVectors. If the out vector is built, we will not
@@ -446,7 +448,8 @@ namespace DoubleVectorHelpers
  /// There are no MPI send and receive, the data stays on the processor
  /// as defined by the distributions from the in vectors.
  void concatenate_without_communication(
-  const Vector<DoubleVector*> &in_vector_pt, DoubleVector &out_vector);
+  const Vector<DoubleVector*> &in_vector_pt, DoubleVector &out_vector,
+  bool debug_flag = false);
 
  /// \short Wrapper around the other concatenate_without_communication(...)
  /// function.
@@ -462,7 +465,8 @@ namespace DoubleVectorHelpers
  /// pointers which will delete themselves, so we do not have to remember 
  /// to delete!
  void concatenate_without_communication(
-  Vector<DoubleVector> &in_vector, DoubleVector &out_vector);
+  Vector<DoubleVector> &in_vector, DoubleVector &out_vector,
+  bool debug_flag = false);
 
  /// \short Split a DoubleVector into the out DoubleVectors.
  /// Data stays on its current processor, no data is sent between processors.
@@ -483,7 +487,8 @@ namespace DoubleVectorHelpers
  /// LinearAlgebraDistributionHelpers::concatenate(...) to concatenate
  /// distributions.
  void split_without_communication(const DoubleVector &in_vector, 
-                                  Vector<DoubleVector*> &out_vector_pt);
+                                  Vector<DoubleVector*> &out_vector_pt,
+                                  bool debug_flag = false);
 
  /// \short Wrapper around the other split_without_communication(...) 
  /// function.
@@ -499,7 +504,8 @@ namespace DoubleVectorHelpers
  /// pointers which will delete themselves, so we do not have to remember 
  /// to delete!
  void split_without_communication(const DoubleVector &in_vector, 
-                                  Vector<DoubleVector> &out_vector);
+                                  Vector<DoubleVector> &out_vector,
+                                  bool debug_flag = false);
 
 } // end of DoubleVectorHelpers namespace
 
