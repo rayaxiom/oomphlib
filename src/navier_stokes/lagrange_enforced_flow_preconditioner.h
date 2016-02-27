@@ -1290,13 +1290,24 @@ void LagrangeEnforcedflowPreconditioner::setup()
 //    std::cout << "============================================" << std::endl; 
 //    std::cout << "============================================" << std::endl; 
 
+  unsigned rnbt = nblock_types();
   unsigned totalnnz=0;
-    for (unsigned block_i = 0; block_i < nblock_types(); block_i++) 
+  Vector<LinearAlgebraDistribution*> block_row_dist_pt;
+  DenseMatrix<CRDoubleMatrix*> mat_to_cat_pt(rnbt,rnbt,0);
+
+  for (unsigned block_i = 0; block_i < rnbt; block_i++) 
+  {
+    for (unsigned block_j = 0; block_j < rnbt; block_j++) 
     {
-      for (unsigned block_j = 0; block_j < nblock_types(); block_j++) 
+      mat_to_cat_pt(block_i,block_j) = new CRDoubleMatrix;
+      get_block(block_i,block_j,*mat_to_cat_pt(block_i,block_j));
+      totalnnz += mat_to_cat_pt(block_i,block_j)->nnz();
+      if(block_j == 0)
       {
-        CRDoubleMatrix tmp_block = get_block(block_i,block_j);
-        totalnnz += tmp_block.nnz();
+        block_row_dist_pt.push_back(
+            mat_to_cat_pt(block_i,block_j)->distribution_pt());
+      }
+
 //        const unsigned tmp_block_nrow = tmp_block.nrow();
 //        const unsigned tmp_block_ncol = tmp_block.ncol();
 //        std::cout << "block(" << block_i  << "," << block_j << ")"
@@ -1306,10 +1317,20 @@ void LagrangeEnforcedflowPreconditioner::setup()
 //        std::cout << "============================================" << std::endl; 
 //        std::cout << "\n" << std::endl; 
       }
-    }
-//    pause("done print out the blocks."); 
+  }
+//    pause("done print out the blocks.");
 
   oomph_info << "totalnnz: " << totalnnz << std::endl; 
+  LinearAlgebraDistribution tmp_dist;
+  LinearAlgebraDistributionHelpers::concatenate(block_row_dist_pt,
+                                                tmp_dist);
+  CRDoubleMatrix result_matrix;
+  result_matrix.build(&tmp_dist);
+
+  CRDoubleMatrixHelpers::concatenate_without_communication(
+    block_row_dist_pt,mat_to_cat_pt,result_matrix,true);
+
+
   
 
   exit(EXIT_SUCCESS);
