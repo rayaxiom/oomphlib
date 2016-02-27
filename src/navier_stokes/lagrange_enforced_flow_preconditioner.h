@@ -1256,7 +1256,7 @@ void LagrangeEnforcedflowPreconditioner::setup()
 //    }
 //    std::cout << "\n" << std::endl; 
 //    pause("I'm back"); 
-    
+  
 
   // RAYTIME
   double t_start_block_setup = TimingHelpers::timer();
@@ -1269,6 +1269,8 @@ void LagrangeEnforcedflowPreconditioner::setup()
   double t_end_block_setup = TimingHelpers::timer();
   double t_block_setup = t_end_block_setup - t_start_block_setup;
   oomph_info << "LGR: block_setup: " << t_block_setup << std::endl;
+
+//  exit(EXIT_SUCCESS);
 
 
 //    pause("Lgr::setup() done block_setup, about to print dof block dist nrow"); 
@@ -1287,24 +1289,30 @@ void LagrangeEnforcedflowPreconditioner::setup()
 //    std::cout << "============================================" << std::endl; 
 //    std::cout << "============================================" << std::endl; 
 //    std::cout << "============================================" << std::endl; 
-//
-//    for (unsigned block_i = 0; block_i < nblock_types(); block_i++) 
-//    {
-//      for (unsigned block_j = 0; block_j < nblock_types(); block_j++) 
-//      {
-//        CRDoubleMatrix tmp_block = get_block(block_i,block_j);
+
+  unsigned totalnnz=0;
+    for (unsigned block_i = 0; block_i < nblock_types(); block_i++) 
+    {
+      for (unsigned block_j = 0; block_j < nblock_types(); block_j++) 
+      {
+        CRDoubleMatrix tmp_block = get_block(block_i,block_j);
+        totalnnz += tmp_block.nnz();
 //        const unsigned tmp_block_nrow = tmp_block.nrow();
 //        const unsigned tmp_block_ncol = tmp_block.ncol();
 //        std::cout << "block(" << block_i  << "," << block_j << ")"
 //                  << " , nrow: " << tmp_block_nrow << ", col: " 
 //                  << tmp_block_ncol << std::endl;
-//
+
 //        std::cout << "============================================" << std::endl; 
 //        std::cout << "\n" << std::endl; 
-//      }
-//    }
-//    pause("done un replaced blocks"); 
-    
+      }
+    }
+//    pause("done print out the blocks."); 
+
+  oomph_info << "totalnnz: " << totalnnz << std::endl; 
+  
+
+  exit(EXIT_SUCCESS);
 
 
   Doc_prec = false;

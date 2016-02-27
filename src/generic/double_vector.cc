@@ -53,10 +53,6 @@ namespace oomph
        std::copy(old_vector_values, 
                  old_vector_values+nrow_local, 
                  Values_pt);
-//       for (unsigned i = 0; i < nrow_local; i++)
-//        {
-//         Values_pt[i] = old_vector_values[i];
-//        }
       }
     }
   }
@@ -84,12 +80,6 @@ namespace oomph
      Values_pt = new double[nrow_local];
      
      std::fill_n(Values_pt,nrow_local,v);
-     
-     // set the data
-//     for (unsigned i = 0; i < nrow_local; i++)
-//      {
-//       Values_pt[i] = v;
-//      }
      Built=true;
     }
    else
@@ -133,12 +123,6 @@ namespace oomph
      unsigned nrow_local = this->nrow_local();
 
      std::fill_n(Values_pt,nrow_local,v);
-
-     // set the residuals
-//     for (unsigned i = 0; i < nrow_local; i++)
-//      {
-//       Values_pt[i] = v;
-//      }
     }
   }
 
@@ -165,10 +149,6 @@ namespace oomph
   std::copy(v.begin() + begin_first_row,
             v.begin() + end,
             Values_pt);
-//  for (unsigned i = begin; i < end; i++)
-//   {
-//    Values_pt[i-begin] = v[i];
-//   }
  }
 
  //============================================================================
