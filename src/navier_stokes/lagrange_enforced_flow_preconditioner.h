@@ -1269,6 +1269,8 @@ void LagrangeEnforcedflowPreconditioner::setup()
   double t_end_block_setup = TimingHelpers::timer();
   double t_block_setup = t_end_block_setup - t_start_block_setup;
   oomph_info << "LGR: block_setup: " << t_block_setup << std::endl;
+  pause("done block setup"); 
+  
 
 //  exit(EXIT_SUCCESS);
 
@@ -1301,22 +1303,24 @@ void LagrangeEnforcedflowPreconditioner::setup()
     {
       mat_to_cat_pt(block_i,block_j) = new CRDoubleMatrix;
       get_block(block_i,block_j,*mat_to_cat_pt(block_i,block_j));
+      
       totalnnz += mat_to_cat_pt(block_i,block_j)->nnz();
+      
       if(block_j == 0)
       {
         block_row_dist_pt.push_back(
             mat_to_cat_pt(block_i,block_j)->distribution_pt());
       }
 
-//        const unsigned tmp_block_nrow = tmp_block.nrow();
-//        const unsigned tmp_block_ncol = tmp_block.ncol();
-//        std::cout << "block(" << block_i  << "," << block_j << ")"
-//                  << " , nrow: " << tmp_block_nrow << ", col: " 
-//                  << tmp_block_ncol << std::endl;
+      const unsigned tmp_block_nrow = tmp_block.nrow();
+      const unsigned tmp_block_ncol = tmp_block.ncol();
+      std::cout << "block(" << block_i  << "," << block_j << ")"
+                  << " , nrow: " << tmp_block_nrow << ", col: " 
+                  << tmp_block_ncol << std::endl;
 
-//        std::cout << "============================================" << std::endl; 
-//        std::cout << "\n" << std::endl; 
-      }
+      std::cout << "============================================" << std::endl; 
+      std::cout << "\n" << std::endl; 
+    }
   }
 //    pause("done print out the blocks.");
 
@@ -1329,9 +1333,6 @@ void LagrangeEnforcedflowPreconditioner::setup()
 
   CRDoubleMatrixHelpers::concatenate_without_communication(
     block_row_dist_pt,mat_to_cat_pt,result_matrix,true);
-
-
-  
 
   exit(EXIT_SUCCESS);
 
