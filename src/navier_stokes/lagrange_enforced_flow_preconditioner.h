@@ -207,6 +207,9 @@ class LagrangeEnforcedflowPreconditioner
     Label_pt = 0;
 
     Doc_prec_directory_pt = 0;
+
+    Do_matcat_test = false;
+    Do_vec_test = false;
   }
 
   /// destructor
@@ -273,6 +276,75 @@ class LagrangeEnforcedflowPreconditioner
   /// r is the residual (rhs), z will contain the solution.
   void preconditioner_solve(const DoubleVector& r, DoubleVector& z)
   {
+
+if(Do_vec_test)
+{
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+// New test for parallel performance.
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+    
+  double t_start_int_get_block_vector = TimingHelpers::timer();
+  unsigned internal_nblock_types = this->internal_nblock_types();
+  // Now see if internet_get_vector works
+  Vector<DoubleVector> dof_vectors;
+  dof_vectors.resize(internal_nblock_types);
+  for (unsigned blocki = 0; blocki < internal_nblock_types; blocki++)
+  {
+    this->internal_get_block_vector(blocki,r,dof_vectors[blocki]);
+  }
+  double t_end_int_get_block_vector = TimingHelpers::timer();
+  double t_int_get_block_vector = t_end_int_get_block_vector 
+                                  - t_start_int_get_block_vector;
+  oomph_info << "LGRSOLVE: int_get_block: " << t_int_get_block_vector << std::endl;
+
+
+///////////////////////////////////////////
+
+  double t_start_veccat = TimingHelpers::timer();
+  // Now to concatenate the vectors.
+  Vector<DoubleVector*> dof_vectors_pt(internal_nblock_types);
+  for (unsigned blocki = 0; blocki < internal_nblock_types; blocki++) 
+  {
+    dof_vectors_pt[blocki] = &dof_vectors[blocki];
+  }
+
+  DoubleVector outvec;
+  DoubleVectorHelpers::concatenate_without_communication(
+      dof_vectors_pt,outvec,true);
+  double t_end_veccat = TimingHelpers::timer();
+  double t_veccat = t_end_veccat-t_start_veccat;
+  oomph_info << "LGRSOLVE: veccat: " << t_veccat << std::endl;
+
+///////////////////////////////////////////
+
+  double t_start_vecsplit = TimingHelpers::timer();
+  DoubleVectorHelpers::split_without_communication(
+      outvec,dof_vectors_pt,true);
+  double t_end_vecsplit = TimingHelpers::timer();
+  double t_vecsplit = t_end_vecsplit-t_start_vecsplit;
+  oomph_info << "LGRSOLVE: vecsplit: " << t_vecsplit << std::endl;
+
+//////////
+  
+  double t_start_int_ret_block_vector = TimingHelpers::timer();
+  for (unsigned blocki = 0; blocki < internal_nblock_types; blocki++) 
+  {
+    this->internal_return_block_vector(blocki,dof_vectors[blocki],z);
+  }
+  double t_end_int_ret_block_vector = TimingHelpers::timer();
+  double t_int_ret_block_vector = t_end_int_ret_block_vector 
+                                  - t_start_int_ret_block_vector;
+  oomph_info << "LGRSOLVE: int_ret_block: " << t_int_ret_block_vector << std::endl;
+  exit(EXIT_SUCCESS);
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+// END OF New test for parallel performance.
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+}
 
     double t_lgrsolve_start = TimingHelpers::timer();
 
@@ -564,6 +636,9 @@ class LagrangeEnforcedflowPreconditioner
   /// \short Clears the memory.
   void clean_up_memory();
 
+  bool Do_matcat_test;
+  bool Do_vec_test;
+
   private:
 
   /// RAYRAY
@@ -648,6 +723,7 @@ class LagrangeEnforcedflowPreconditioner
   bool First_NS_solve;
 
   bool Replace_all_f_blocks;
+
 
 
   /// \short Pointer to Doc_linear_solver_info.
@@ -1288,39 +1364,80 @@ void LagrangeEnforcedflowPreconditioner::setup()
 //    std::cout << "============================================" << std::endl; 
 //    std::cout << "============================================" << std::endl; 
 
-  unsigned rnbt = nblock_types();
+if(Do_matcat_test)
+{
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+// New test for parallel performance.
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+
+  unsigned internal_nblock_types = this->internal_nblock_types();
+  unsigned internal_ndof_types = this->internal_ndof_types();
+
+  oomph_info << "internal_nblock_types: " << internal_nblock_types << std::endl; 
+  oomph_info << "internal_ndof_types: " << internal_ndof_types << std::endl; 
+
+  // Print out the nrow of blocks.
+//  for (unsigned block_i = 0; block_i < internal_nblock_types; block_i++)
+//  {
+//    CRDoubleMatrix temp_mat;
+//    this->internal_get_block(0,block_i,temp_mat);
+//    unsigned tnrow = temp_mat.nrow();
+//    unsigned tncol = temp_mat.ncol();
+//    oomph_info << "block 0," << block_i << "), nrow: "  << tnrow << ", ncol: " << tncol<< std::endl; 
+//  }
+  
+  
   unsigned totalnnz=0;
   Vector<LinearAlgebraDistribution*> block_row_dist_pt;
-  DenseMatrix<CRDoubleMatrix*> mat_to_cat_pt(rnbt,rnbt,0);
+  DenseMatrix<CRDoubleMatrix*> mat_to_cat_pt(
+      internal_nblock_types,
+      internal_nblock_types,0);
+  
+  double t_start_internal_get_block = TimingHelpers::timer();
 
-  for (unsigned block_i = 0; block_i < rnbt; block_i++) 
+  for (unsigned block_i = 0; block_i < internal_nblock_types; block_i++) 
   {
-    for (unsigned block_j = 0; block_j < rnbt; block_j++) 
+    for (unsigned block_j = 0; block_j < internal_nblock_types; block_j++) 
     {
       mat_to_cat_pt(block_i,block_j) = new CRDoubleMatrix;
-      get_block(block_i,block_j,*mat_to_cat_pt(block_i,block_j));
+      this->internal_get_block(block_i,block_j,*mat_to_cat_pt(block_i,block_j));
       
-      totalnnz += mat_to_cat_pt(block_i,block_j)->nnz();
+      unsigned blocknnz = mat_to_cat_pt(block_i,block_j)->nnz();
+
+      totalnnz += blocknnz;
       
+      // Push back the distribution for concatenation.
       if(block_j == 0)
       {
         block_row_dist_pt.push_back(
             mat_to_cat_pt(block_i,block_j)->distribution_pt());
       }
 
+      // Print out the 
       const unsigned tmp_block_nrow 
         = mat_to_cat_pt(block_i,block_j)->nrow();
 
       const unsigned tmp_block_ncol 
         = mat_to_cat_pt(block_i,block_j)->ncol();
+      const unsigned tmp_block_nrow_local
+        = mat_to_cat_pt(block_i,block_j)->nrow_local();
 
-      std::cout << "block(" << block_i  << "," << block_j << ")"
-                  << " , nrow: " << tmp_block_nrow << ", col: " 
-                  << tmp_block_ncol << std::endl;
-      std::cout << "\n" << std::endl; 
+      std::cout << "block(" << block_i  << "," << block_j << ") "
+                  << ", nrow: " << tmp_block_nrow 
+                  << ", ncol: "   << tmp_block_ncol
+                  << ", nrowlocal: " << tmp_block_nrow_local 
+                  << ", (local) nnz: " << blocknnz << std::endl;
     }
+    std::cout << "\n" << std::endl; 
   }
-//    pause("done print out the blocks.");
+  double t_end_internal_get_block = TimingHelpers::timer();
+  double t_internal_get_block = t_end_internal_get_block - t_start_internal_get_block;
+  oomph_info << "LGR: internal_get_block: " << t_internal_get_block << std::endl;
+
+  //    pause("done print out the blocks.");
 
   oomph_info << "totalnnz: " << totalnnz << std::endl; 
   LinearAlgebraDistribution tmp_dist;
@@ -1335,9 +1452,18 @@ void LagrangeEnforcedflowPreconditioner::setup()
   double t_end_matcat = TimingHelpers::timer();
   double t_matcat = t_end_matcat - t_start_matcat;
   oomph_info << "LGR: matcat: " << t_matcat << std::endl;
+
   exit(EXIT_SUCCESS);
 
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+// END OF New test for parallel performance.
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+}
 
+if(!Do_vec_test)
+{
   Doc_prec = false;
 
   if(Doc_prec)
@@ -2717,8 +2843,8 @@ void LagrangeEnforcedflowPreconditioner::setup()
         << t_delete_w << "\n";
 
     Mapping_info_calculated = true;
-    
-  } // end of LagrangeEnforcedflowPreconditioner::setup
+} // if ! Do_vec_test
+} // end of LagrangeEnforcedflowPreconditioner::setup
 
 
   //========================================================================

@@ -1855,7 +1855,7 @@ class BlockSelector
       // find the processor which this global index in block belongs to.
       unsigned block_proc 
         = internal_block_distribution_pt(internal_dof_block_number)
-        ->rank_of_global_row_map(internal_index_in_dof);
+        ->rank_of_global_row(internal_index_in_dof);
 
       // Add up all of the first rows.
       const unsigned ndof_in_block 
@@ -2438,7 +2438,6 @@ class BlockSelector
     setup_matrix_vector_product(matvec_prod_pt,block_pt,col_index_vector);
   } // EOFunc setup_matrix_vector_product(...)
 
- private:
 
   /// \short Given the naturally ordered vector, v, return
   /// the vector rearranged in block order in w. This is a legacy function
@@ -2839,6 +2838,8 @@ class BlockSelector
      return (pos < int(vec.size()) && pos >=0) ? pos : -1;
    }
  }
+
+ private:
 
  protected:
 

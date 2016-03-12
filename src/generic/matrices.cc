@@ -5231,6 +5231,43 @@ namespace CRDoubleMatrixHelpers
     oomph_info << "RRR3 construct col_offset: " << RRR3diff << std::endl; 
   }
 
+  double RRR33start = TimingHelpers::timer();
+  // Do some pre-processing for the processor number a global row number is 
+  // on. This is required when permuting the column entries.
+  // We need to do this for each distribution, so we have a vector of 
+  // vectors. First index corresponds to the distribution, the second is
+  // the processor number.
+  std::vector<std::vector<unsigned> > p_for_rows(
+      nblock_col,std::vector<unsigned>());
+  // initialise 2D vector
+  for (unsigned blocki = 0; blocki < nblock_col; blocki++) 
+  {
+    int blockinrow = col_distribution_pt[blocki]->nrow();
+    p_for_rows[blocki].resize(blockinrow);
+    // FOR each global index in the block, work out the corresponding proc.
+    for (int rowi = 0; rowi < blockinrow; rowi++) 
+    {
+      unsigned p = 0;
+      int b_first_row = col_distribution_pt[blocki]->first_row(p);
+      int b_nrow_local = col_distribution_pt[blocki]->nrow_local(p);
+
+      while (rowi < b_first_row ||
+             rowi >= b_nrow_local + b_first_row)
+      {
+        p++;
+        b_first_row = col_distribution_pt[blocki]->first_row(p);
+        b_nrow_local = col_distribution_pt[blocki]->nrow_local(p);
+      }
+      p_for_rows[blocki][rowi] = p;
+    }
+  }
+  double RRR33end = TimingHelpers::timer();
+  if(debug_flag)
+  {
+    double RRR33diff = RRR33end-RRR33start;
+    oomph_info << "RRR33 Generate p_for_rows: " << RRR33diff << std::endl; 
+  }
+
   double RRR4start = TimingHelpers::timer();
   // determine nnz of all blocks on this processor only.
   // This is used to create storage space.
@@ -5307,9 +5344,20 @@ namespace CRDoubleMatrixHelpers
            {
             // if b_column_index[l] was a row index, what processor
             // would it be on
-            unsigned p = col_distribution_pt[j]
-              ->rank_of_global_row_map(b_column_index[l]);
+//            unsigned p = col_distribution_pt[j]
+//              ->rank_of_global_row_map(b_column_index[l]);
+            unsigned p = p_for_rows[j][b_column_index[l]];
+
             int b_first_row = col_distribution_pt[j]->first_row(p);
+//            int b_nrow_local = col_distribution_pt[j]->nrow_local(p);
+
+//            while (b_column_index[l] < b_first_row || 
+//                   b_column_index[l] >= b_nrow_local+b_first_row)
+//             {
+//              p++;
+//              b_first_row = col_distribution_pt[j]->first_row(p);
+//              b_nrow_local = col_distribution_pt[j]->nrow_local(p);
+//             }
 
             // determine the local equation number in the block j/processor p
             // "column block"
