@@ -2077,7 +2077,7 @@ namespace oomph
      if(debug_flag)
      {
        double RRR1diff = RRR1end - RRR1start;
-       oomph_info << "RRR1 out_vector.build: " << RRR1diff << std::endl; 
+       oomph_info << "RRR1 VECCAT out_vector.build: " << RRR1diff << std::endl; 
      }
 
     }
@@ -2192,7 +2192,7 @@ namespace oomph
     if(debug_flag)
     {
       double RRR2diff = RRR2end - RRR2start;
-      oomph_info << "RRR2 done cat: " << RRR2diff << std::endl; 
+      oomph_info << "RRR2 VECCAT done cat: " << RRR2diff << std::endl; 
     }
 
   } // function concatenate_without_communication
@@ -2380,7 +2380,7 @@ namespace oomph
    if(debug_flag)
    {
      double RRR1diff = RRR1end - RRR1start;
-     oomph_info << "RRR1 done split: " << RRR1diff << std::endl; 
+     oomph_info << "RRR1 VECSPLIT done split: " << RRR1diff << std::endl; 
    }
 
   } // function split_distribution_vector

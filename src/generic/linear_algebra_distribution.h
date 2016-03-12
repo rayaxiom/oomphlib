@@ -414,10 +414,10 @@ class LinearAlgebraDistribution
    return First_row;
   }
 
- unsigned rank_of_global_row_map(const unsigned& i) const
- {
-   return Rank_of_global_row_map[i];
- }
+// unsigned rank_of_global_row_map(const unsigned& i) const
+// {
+//   return Rank_of_global_row_map[i];
+// }
 
   private:
  
@@ -431,7 +431,7 @@ class LinearAlgebraDistribution
  Vector<unsigned> First_row;
 
  /// the rank of global row map
- Vector<unsigned> Rank_of_global_row_map;
+// Vector<unsigned> Rank_of_global_row_map;
   
  /// flag to indicate whether this distribution describes an object that is
  /// distributed over the processors of Comm_pt (true) or duplicated over the
