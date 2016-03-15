@@ -1241,7 +1241,7 @@ CRDoubleMatrix::CRDoubleMatrix()
 
     // set the serial matrix-matrix multiply method
 #ifdef OOMPH_HAS_TRILINOS
-    Serial_matrix_matrix_multiply_method = 2;
+    Serial_matrix_matrix_multiply_method = 4;
 #else
     Serial_matrix_matrix_multiply_method = 2;
 #endif
@@ -1290,7 +1290,7 @@ CRDoubleMatrix::CRDoubleMatrix(const CRDoubleMatrix& other_matrix)
 
  // set the serial matrix-matrix multiply method
 #ifdef OOMPH_HAS_TRILINOS
- Serial_matrix_matrix_multiply_method = 2;
+ Serial_matrix_matrix_multiply_method = 4;
 #else
  Serial_matrix_matrix_multiply_method = 2;
 #endif
@@ -1314,7 +1314,7 @@ CRDoubleMatrix::CRDoubleMatrix(const LinearAlgebraDistribution*
 
 // set the serial matrix-matrix multiply method
 #ifdef OOMPH_HAS_TRILINOS
-    Serial_matrix_matrix_multiply_method = 2;
+    Serial_matrix_matrix_multiply_method = 4;
 #else
     Serial_matrix_matrix_multiply_method = 2;
 #endif
@@ -1343,7 +1343,7 @@ CRDoubleMatrix::CRDoubleMatrix(const LinearAlgebraDistribution* dist_pt,
 
  // set the serial matrix-matrix multiply method
 #ifdef OOMPH_HAS_TRILINOS
- Serial_matrix_matrix_multiply_method = 2;
+ Serial_matrix_matrix_multiply_method = 4;
 #else
  Serial_matrix_matrix_multiply_method = 2;
 #endif
