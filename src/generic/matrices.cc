@@ -3205,6 +3205,12 @@ void CRDoubleMatrix::add(const CRDoubleMatrix &matrix_in,
   }
 }
 
+namespace RRR
+{
+  std::string RayStr="";
+  bool RayBool=false;
+}
+
 //=================================================================
 /// Namespace for helper functions for CRDoubleMatrices
 //=================================================================

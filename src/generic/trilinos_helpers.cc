@@ -859,19 +859,48 @@ void TrilinosEpetraHelpers::multiply(const CRDoubleMatrix &matrix_1,
    temp_use_ml = use_ml;
   }
 
+ double RRR1start = TimingHelpers::timer();
+
  // create matrix 1
  Epetra_CrsMatrix* epetra_matrix_1_pt = 
   create_distributed_epetra_matrix(&matrix_1,matrix_2.distribution_pt());
 
+ double RRR1end = TimingHelpers::timer();
+ if(RRR::RayBool)
+  {
+    double RRR1diff = RRR1end-RRR1start;
+    oomph_info << "TriliSpMM1 convert to epetra M1: "
+               << RRR::RayStr << ": " 
+               << RRR1diff << std::endl; 
+  }
+
+ double RRR11start = TimingHelpers::timer();
  // create matrix 2
  LinearAlgebraDistribution matrix_2_column_dist(
   matrix_2.distribution_pt()->communicator_pt(),matrix_2.ncol(),true);
  Epetra_CrsMatrix* epetra_matrix_2_pt =
   create_distributed_epetra_matrix(&matrix_2,&matrix_2_column_dist);
 
+ double RRR11end = TimingHelpers::timer();
+ if(RRR::RayBool)
+  {
+    double RRR11diff = RRR11end-RRR11start;
+    oomph_info << "TriliSpMM1 convert to epetra M2: "
+               << RRR::RayStr << ": " 
+               << RRR11diff << std::endl; 
+  }
+
  // create the Trilinos epetra matrix to hold solution - will have same map 
  // (and number of rows) as matrix_1
  Epetra_CrsMatrix* solution_pt;
+// double RRR1end = TimingHelpers::timer();
+// if(RRR::RayBool)
+//  {
+//    double RRR1diff = RRR1end-RRR1start;
+//    oomph_info << "TriliSpMM1 convert to epetra: "
+//               << RRR::RayStr << ": " 
+//               << RRR1diff << std::endl; 
+//  }
 
  // do the multiplication
  // ---------------------
@@ -892,31 +921,52 @@ void TrilinosEpetraHelpers::multiply(const CRDoubleMatrix &matrix_1,
  else
  {
 
+  double RRR2start = TimingHelpers::timer();
   // this method requires us to pass in the solution matrix
   solution_pt = new Epetra_CrsMatrix(Copy,epetra_matrix_1_pt->RowMap(),
                                      0);
-#ifdef PARANOID
-  int epetra_error_flag = 0;
-  epetra_error_flag = 
-#endif
+ double RRR2end = TimingHelpers::timer();
+  if(RRR::RayBool)
+  {
+    double RRR2diff = RRR2end-RRR2start;
+    oomph_info << "TriliSpMM2 : copy epemat1 to soln: "
+               << RRR::RayStr << ": " 
+               << RRR2diff << std::endl; 
+  }
+
+//#ifdef PARANOID
+//  int epetra_error_flag = 0;
+//  epetra_error_flag = 
+//#endif
+
+   double RRR3start = TimingHelpers::timer();
    EpetraExt::MatrixMatrix::Multiply(*epetra_matrix_1_pt,
                                      false,
                                      *epetra_matrix_2_pt,
                                      false,
                                      *solution_pt);
-#ifdef PARANOID
-  if (epetra_error_flag != 0)
-   {
-    std::ostringstream error_message;
-    error_message << "error flag from Multiply(): "
-                  << epetra_error_flag
-                  << " from TrilinosHelpers::multiply"
-                  << std::endl;
-    throw OomphLibError(error_message.str(),
-                        OOMPH_CURRENT_FUNCTION,
-                        OOMPH_EXCEPTION_LOCATION);
-   }
-#endif
+ double RRR3end = TimingHelpers::timer();
+  if(RRR::RayBool)
+  {
+    double RRR3diff = RRR3end-RRR3start;
+    oomph_info << "TriliSpMM3 : time for epetra SpMM: "
+               << RRR::RayStr << ": " 
+               << RRR3diff << std::endl; 
+  }
+
+//#ifdef PARANOID
+//  if (epetra_error_flag != 0)
+//   {
+//    std::ostringstream error_message;
+//    error_message << "error flag from Multiply(): "
+//                  << epetra_error_flag
+//                  << " from TrilinosHelpers::multiply"
+//                  << std::endl;
+//    throw OomphLibError(error_message.str(),
+//                        OOMPH_CURRENT_FUNCTION,
+//                        OOMPH_EXCEPTION_LOCATION);
+//   }
+//#endif
  }
 
  // extract values and put into solution
@@ -981,6 +1031,8 @@ void TrilinosEpetraHelpers::multiply(const CRDoubleMatrix &matrix_1,
  }                     
 #endif
 
+ double RRR4start = TimingHelpers::timer();
+
  // extract values from Epetra matrix row by row
  double* value = new double[nnz_local];
  int* column_index = new int[nnz_local];
@@ -1010,6 +1062,15 @@ void TrilinosEpetraHelpers::multiply(const CRDoubleMatrix &matrix_1,
                                 value,
                                 column_index,
                                 row_start);
+ double RRR4end = TimingHelpers::timer();
+  if(RRR::RayBool)
+  {
+    double RRR4diff = RRR4end-RRR4start;
+    oomph_info << "TriliSpMM4 : Time to build oomphmat: "
+               << RRR::RayStr << ": " 
+               << RRR4diff << std::endl; 
+  }
+
 }
 
 

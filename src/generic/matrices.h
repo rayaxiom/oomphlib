@@ -3174,6 +3174,12 @@ template<class T,class MATRIX_TYPE>
  T SparseMatrix<T,MATRIX_TYPE>::Zero=T(0);
 
 
+namespace RRR
+{
+  extern std::string RayStr;
+  extern bool RayBool;
+}
+
  //=================================================================
  /// Namespace for helper functions for CRDoubleMatrices
  //=================================================================
