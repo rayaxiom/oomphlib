@@ -1455,7 +1455,7 @@ if(Do_matcat_test)
 
 if(!Do_vec_test)
 {
-  Doc_prec = false;
+  Doc_prec = true;
 
   if(Doc_prec)
   {
@@ -1471,11 +1471,17 @@ if(!Do_vec_test)
       CRDoubleMatrix tempblock;
       this->get_block(blocki,blockj,tempblock);
       std::stringstream blockname;
-      blockname << "milaneig/j_"
-      << std::setw(2) << std::setfill('0') << blocki
-      << std::setw(2) << std::setfill('0') << blockj;
-      tempblock.sparse_indexed_output(blockname.str(),15,true);
+      blockname << "b("
+      << std::setw(2) << std::setfill('0') << blocki << ","
+      << std::setw(2) << std::setfill('0') << blockj <<")";
+      unsigned ttnnz = tempblock.nnz();
+      unsigned ttnrow = tempblock.nrow();
+      unsigned ttncol = tempblock.ncol();
+      oomph_info << blockname.str() << " nnz: " << ttnnz << " nrow: " << ttnrow << " ncol: " <<ttncol << std::endl; 
+
+//      tempblock.sparse_indexed_output(blockname.str(),15,true);
     }
+      oomph_info << "\n" << std::endl;
   }
 
   exit(EXIT_SUCCESS);
