@@ -1459,6 +1459,29 @@ if(!Do_vec_test)
 
   if(Doc_prec)
   {
+
+/// New test
+////////////////////////////////////////////////////////////////////////////
+{
+  unsigned nblock = this->internal_nblock_types();
+  for (unsigned blocki = 0; blocki < nblock; blocki++) 
+  {
+    for (unsigned blockj = 0; blockj < nblock; blockj++) 
+    {
+      CRDoubleMatrix tempblock;
+      this->get_block(blocki,blockj,tempblock);
+      std::stringstream blockname;
+      blockname << "milaneig/j_"
+      << std::setw(2) << std::setfill('0') << blocki
+      << std::setw(2) << std::setfill('0') << blockj;
+      tempblock.sparse_indexed_output(blockname.str(),15,true);
+    }
+  }
+
+  exit(EXIT_SUCCESS);
+}
+////////////////////////////////////////////////////////////////////////////
+
     //    unsigned my_rank 
     //     = master_distribution_pt()->communicator_pt()->my_rank();
     //    unsigned nproc 

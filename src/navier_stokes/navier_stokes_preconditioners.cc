@@ -382,6 +382,9 @@ namespace oomph
   // Build pressure Poisson matrix 
   CRDoubleMatrix* p_matrix_pt = new CRDoubleMatrix;
 
+  RRR::RayBool = true;
+  RRR::RayStr = "Q_Bt";
+
   // Multiply inverse velocity mass matrix by gradient matrix B^T
   double t_QBt_matrix_start = TimingHelpers::timer();
   CRDoubleMatrix* qbt_pt = new CRDoubleMatrix;
@@ -407,6 +410,10 @@ namespace oomph
   
   // Multiply B from left by divergence matrix B and store result in 
   // pressure Poisson matrix.
+
+  RRR::RayStr = "B_QBt";
+  oomph_info << "" << std::endl; 
+  
   double t_p_matrix_start = TimingHelpers::timer();
   b_pt->multiply(*bt_pt, *p_matrix_pt);
   double t_p_matrix_finish = TimingHelpers::timer();
@@ -426,6 +433,8 @@ namespace oomph
              << t_p_time << std::endl;
   }
 
+  RRR::RayStr = "DoneAllSpGEMM, why are you seeing this?";
+  RRR::RayBool = false;
 
   // Build the matvec operator for QBt
   double t_QBt_MV_start = TimingHelpers::timer();
