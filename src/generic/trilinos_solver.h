@@ -136,6 +136,7 @@ namespace oomph
   int ApplyInverse(const Epetra_MultiVector &epetra_r, 
                    Epetra_MultiVector &epetra_z) const
    {
+//     pause("Just got in ApplyInverse"); 
     // the oomph-lib vector for r
     DoubleVector oomph_r;
 
@@ -175,6 +176,7 @@ namespace oomph
      }
 
     // apply the preconditioner
+//    pause("RRR about to call preconditioner solve."); 
     Oomph_lib_preconditioner_pt->preconditioner_solve(oomph_r,oomph_z);
 
     // if not using external data copy the oomph-lib vector oomph_Y back to Y
