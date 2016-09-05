@@ -94,7 +94,7 @@ namespace oomph
   Jacobian_setup_time = end_t-start_t;
   if (this->Doc_time)
    {
-    oomph_info << "RAYRAY1 Time to generate Jacobian [sec]    : "
+    oomph_info << "Time to generate Jacobian [sec]    : "
                << Jacobian_setup_time << std::endl;
    }
 
@@ -256,7 +256,7 @@ void TrilinosAztecOOSolver::solve(DoubleMatrixBase* const& matrix_pt,
  double end_t_trilinos = TimingHelpers::timer();
  if (this->Doc_time)
  {
-  oomph_info << "RAYRAY4 Time for trilinos solve itself                 : "
+  oomph_info << "Time for trilinos solve itself                 : "
              << end_t_trilinos-start_t_trilinos
              << "s" << std::endl;
  }
@@ -275,17 +275,13 @@ void TrilinosAztecOOSolver::solve(DoubleMatrixBase* const& matrix_pt,
 
  // stop timers and compute solve time
  double end_t = TimingHelpers::timer();
- // RAYRAY - Here I am taking the trilinos solve itself as the linear solver
- // time.
- // Linear_solver_solution_time = end_t-start_t;
- Linear_solver_solution_time = end_t_trilinos-start_t_trilinos;
-
+ Linear_solver_solution_time = end_t-start_t;
 
  // output timings and info
  if (this->Doc_time)
  {
-  oomph_info << "RAYRAY5 Time for complete trilinos solve                  : "
-             << (end_t - start_t)
+  oomph_info << "Time for complete trilinos solve                  : "
+             << Linear_solver_solution_time
              << "s" << std::endl;
  }
 
@@ -340,7 +336,7 @@ void TrilinosAztecOOSolver::solver_setup(DoubleMatrixBase* const& matrix_pt)
      if (Doc_time)
       {
        double t_prec_setup = prec_setup_finish_t - prec_setup_start_t;
-       oomph_info << "RAYRAY2OOMPH Time for preconditioner setup [sec]: "
+       oomph_info << "Time for preconditioner setup [sec]: "
                   << t_prec_setup << std::endl;
       }
 #ifdef PARANOID
@@ -398,7 +394,7 @@ void TrilinosAztecOOSolver::solver_setup(DoubleMatrixBase* const& matrix_pt)
  // output times
  if (Doc_time)
  {
-  oomph_info << "RAYRAY3 Time to generate Trilinos matrix      : "
+  oomph_info << "Time to generate Trilinos matrix      : "
              << double(end_t_matrix-start_t_matrix)
              << "s" << std::endl;
  }
@@ -450,7 +446,7 @@ void TrilinosAztecOOSolver::solver_setup(DoubleMatrixBase* const& matrix_pt)
      if (Doc_time)
       {
        double t_prec_setup = prec_setup_finish_t - prec_setup_start_t;
-       oomph_info << "RAYRAY2TRI Time for preconditioner setup [sec]: "
+       oomph_info << "Time for preconditioner setup [sec]: "
                   << t_prec_setup << std::endl;
       }
     }

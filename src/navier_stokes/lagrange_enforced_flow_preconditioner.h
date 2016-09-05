@@ -1471,51 +1471,75 @@ if(!Do_vec_test)
       CRDoubleMatrix tempblock;
       this->get_block(blocki,blockj,tempblock);
       std::stringstream blockname;
-      blockname << "b("
-      << std::setw(2) << std::setfill('0') << blocki << ","
-      << std::setw(2) << std::setfill('0') << blockj <<")";
-      unsigned ttnnz = tempblock.nnz();
-      unsigned ttnrow = tempblock.nrow();
-      unsigned ttncol = tempblock.ncol();
-      oomph_info << blockname.str() << " nnz: " << ttnnz << " nrow: " << ttnrow << " ncol: " <<ttncol << std::endl; 
+      blockname << "matdata/j_"
+      << std::setw(2) << std::setfill('0') << blocki
+      << std::setw(2) << std::setfill('0') << blockj;
+//      unsigned ttnnz = tempblock.nnz();
+//      unsigned ttnrow = tempblock.nrow();
+//      unsigned ttncol = tempblock.ncol();
+//      oomph_info << blockname.str() 
+//        << " nnz: " 
+//        << ttnnz 
+//        << " nrow: " 
+//        << ttnrow 
+//        << " ncol: " 
+//        <<ttncol << std::endl; 
 
-//      tempblock.sparse_indexed_output(blockname.str(),15,true);
+      tempblock.sparse_indexed_output(blockname.str(),15,true);
     }
-      oomph_info << "\n" << std::endl;
+//      oomph_info << "\n" << std::endl;
   }
 
-  exit(EXIT_SUCCESS);
+//  exit(EXIT_SUCCESS);
 }
 ////////////////////////////////////////////////////////////////////////////
-
-    //    unsigned my_rank 
-    //     = master_distribution_pt()->communicator_pt()->my_rank();
-    //    unsigned nproc 
-    //     = master_distribution_pt()->communicator_pt()->nproc();
-    // This is for bebugging purposes.
-    //    std::stringstream curr_setting_stream;
-    //    curr_setting_stream << "NP" << nproc << "R" << my_rank;
-    //    std::string currentsetting = curr_setting_stream.str();
-//      std::string currentsetting 
-//        = *Label_pt + "NS"
-//        + StringConversion::to_string(Doc_linear_solver_info_pt
-//            ->current_nnewton_step());
-
-    // Output the spatial dimension,
-    // on a new line, output the number of dof types in each mesh
-    // This information allows us to assemble the preconditioner in, say, 
-    // MATLAB
-//      std::ofstream precinfo_ofstream;
-//      std::string precinfo_string = *Doc_prec_directory_pt + "/precinfo_" + currentsetting;
-//      precinfo_ofstream.open(precinfo_string.c_str());
-//      // The dimension
-//      precinfo_ofstream << spatial_dim << " ";
-      // The number of blocks
-    unsigned nblock_types = this->nblock_types();
-//      std::string block_name = "J_";
-
-
-//      for (unsigned mesh_i = 0; mesh_i < My_nmesh; mesh_i++)
+//
+//    //    unsigned my_rank 
+//    //     = master_distribution_pt()->communicator_pt()->my_rank();
+//    //    unsigned nproc 
+//    //     = master_distribution_pt()->communicator_pt()->nproc();
+//    // This is for bebugging purposes.
+//    //    std::stringstream curr_setting_stream;
+//    //    curr_setting_stream << "NP" << nproc << "R" << my_rank;
+//    //    std::string currentsetting = curr_setting_stream.str();
+////      std::string currentsetting 
+////        = *Label_pt + "NS"
+////        + StringConversion::to_string(Doc_linear_solver_info_pt
+////            ->current_nnewton_step());
+//
+//    // Output the spatial dimension,
+//    // on a new line, output the number of dof types in each mesh
+//    // This information allows us to assemble the preconditioner in, say, 
+//    // MATLAB
+////      std::ofstream precinfo_ofstream;
+////      std::string precinfo_string = *Doc_prec_directory_pt + "/precinfo_" + currentsetting;
+////      precinfo_ofstream.open(precinfo_string.c_str());
+////      // The dimension
+////      precinfo_ofstream << spatial_dim << " ";
+//      // The number of blocks
+//    unsigned nblock_types = this->nblock_types();
+////      std::string block_name = "J_";
+//
+//
+////      for (unsigned mesh_i = 0; mesh_i < My_nmesh; mesh_i++)
+////      {
+////        precinfo_ofstream << this->My_ndof_types_in_mesh[mesh_i] << " ";
+////      }
+////      precinfo_ofstream.close();
+//
+//////////////////////////////////////////////////////////////////////////////
+//    // This is new, just for double checking, I'm outputting the numbers of
+//    // rows and columns for each block.
+//    std::ofstream blocknrowncol_ofstream;
+//    std::string blocknrowncol_string = "temprawmat/blocknrowncol";
+//    blocknrowncol_ofstream.open(blocknrowncol_string.c_str());
+//
+//
+//    // Now output all the blocks.
+//    // Loop through all the blocks and output them.
+//    for(unsigned Mi=0; Mi<nblock_types; Mi++)
+//    {
+//      for(unsigned Mj=0; Mj<nblock_types; Mj++)
 //      {
 //        precinfo_ofstream << this->My_ndof_types_in_mesh[mesh_i] << " ";
 //      }
@@ -1598,6 +1622,71 @@ if(!Do_vec_test)
       delete inv_p_mass_pt;
       inv_p_mass_pt = 0;
     }
+// {
+// {
+//        CRDoubleMatrix* sub_matrix_pt = new CRDoubleMatrix;
+//        this->get_block(Mi,Mj,*sub_matrix_pt);
+//        std::stringstream blockname;
+////          blockname << *Doc_prec_directory_pt+"/j_"<< currentsetting<< "_"
+//        blockname << "temprawmat/j_"
+//          << std::setw(2) << std::setfill('0') << Mi
+//          << std::setw(2) << std::setfill('0') << Mj;
+//        sub_matrix_pt->sparse_indexed_output(blockname.str(),15,true);
+//
+//        // Now output the nrow and ncol.
+//        blocknrowncol_ofstream << "block " << Mi << " " << Mj << " "
+//                               << sub_matrix_pt->nrow() << " " 
+//                               << sub_matrix_pt->ncol() << std::endl;
+//        delete sub_matrix_pt;
+//        sub_matrix_pt = 0;
+//      }//for
+//    }//for
+//    
+//    blocknrowncol_ofstream.close();
+//    // Now get the mass matrices for LSC solve
+//
+//    // Extract all of the inv_v_mass.
+//    CRDoubleMatrix* inv_v_mass_pt = 0;
+//    CRDoubleMatrix* inv_p_mass_pt = 0;
+//
+//    for(unsigned dof_type_i = 0;
+//        dof_type_i < N_velocity_doftypes; dof_type_i++)
+//    {
+//      unsigned required_block = dof_type_i; //Doftype_list_vpl[dof_type_i];
+//      oomph_info << "Getting vmm block: " << required_block << std::endl; 
+//
+//      
+//      assemble_inv_press_and_veloc_mass_matrix_diagonal
+//        (inv_p_mass_pt, inv_v_mass_pt, required_block);
+//
+//      std::stringstream blockname;
+//      blockname << "temprawmat/vmm_"
+//        << std::setw(2) << std::setfill('0') << required_block
+//        << std::setw(2) << std::setfill('0') << required_block;
+//      inv_v_mass_pt->sparse_indexed_output(blockname.str(),15,true);
+//      delete inv_v_mass_pt;
+//      inv_v_mass_pt = 0;
+//    }
+//
+//    // Get the pressure mass matrix.
+//    //      for(unsigned dof_type_i = 0;
+////          dof_type_i < N_velocity_doftypes; dof_type_i++)
+//    {
+//      unsigned required_block = N_velocity_doftypes; //Doftype_list_vpl[dof_type_i];
+//              oomph_info << "Getting pressure mass matrix, block: " << required_block  << std::endl; 
+//      assemble_inv_press_and_veloc_mass_matrix_diagonal
+//        (inv_p_mass_pt, inv_v_mass_pt, required_block);
+//
+//
+//        
+//      std::stringstream blockname;
+//      blockname << "temprawmat/pmm_"
+//        << std::setw(2) << std::setfill('0') << required_block
+//        << std::setw(2) << std::setfill('0') << required_block;
+//      inv_p_mass_pt->sparse_indexed_output(blockname.str(),15,true);
+//      delete inv_p_mass_pt;
+//      inv_p_mass_pt = 0;
+//    }
   }// if Doc_prec
 
 //  pause("Dumped!"); 
