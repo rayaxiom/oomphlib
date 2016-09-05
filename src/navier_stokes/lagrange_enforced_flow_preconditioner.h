@@ -1637,11 +1637,13 @@ void LagrangeEnforcedflowPreconditioner::setup()
         mm_pt[m_i]->multiply(*mmt_pt[m_i],*temp_mm_sqrd_pt);
 
         Vector<double> m_diag = temp_mm_sqrd_pt->diagonal_entries();
+//        Vector<double> m_diag = mm_pt[m_i]->diagonal_entries();
 
         // Loop through the entries, add them.
         for(unsigned long row_i = 0; row_i < l_i_nrow_local; row_i++)
         {
           w_i_diag_values[row_i] += m_diag[row_i];
+//          w_i_diag_values[row_i] += (m_diag[row_i]* m_diag[row_i]);
         }
 
         delete temp_mm_sqrd_pt; temp_mm_sqrd_pt = 0;
@@ -2366,7 +2368,24 @@ void LagrangeEnforcedflowPreconditioner::setup()
       //      vector.
       // 4) Concatenate the two vectors.
 
-      unsigned dof_index = 0;
+//      Artificial test data
+//      n_dof_types = 13;
+//      My_nmesh = 3;
+//      spatial_dim = 3;
+//      My_ndof_types_in_mesh.resize(3,0);
+//      My_ndof_types_in_mesh[0] = 4;
+//      My_ndof_types_in_mesh[1] = 5;
+//      My_ndof_types_in_mesh[2] = 4;
+//      // Outputting My_ndof_types_in_mesh
+//      for (unsigned i = 0; i < My_ndof_types_in_mesh.size(); i++) 
+//      {
+//        std::cout << "My_ndof_inmesh: " 
+//                  << My_ndof_types_in_mesh[i] << std::endl; 
+//      }
+//      pause("Need someone."); 
+      
+
+      unsigned partial_sum_index = 0;
 
       Subsidiary_list_bcpl.resize(0,0);
       for(unsigned mesh_i = 0; mesh_i < My_nmesh; mesh_i++)
@@ -2374,11 +2393,11 @@ void LagrangeEnforcedflowPreconditioner::setup()
         // Store the velocity dof types.
         for(unsigned dim_i = 0; dim_i < spatial_dim; dim_i++)
         {
-          Subsidiary_list_bcpl.push_back(dof_index++);
+          Subsidiary_list_bcpl.push_back(partial_sum_index + dim_i);
         } // for spatial_dim
 
         // Update the DOF index
-        dof_index = My_ndof_types_in_mesh[mesh_i];
+        partial_sum_index += My_ndof_types_in_mesh[mesh_i];
       } // for My_nmesh
 
       // push back the pressure DOF type
@@ -2386,21 +2405,33 @@ void LagrangeEnforcedflowPreconditioner::setup()
 
     } // end of encapsulating
 
-      // Output for artificial test.
-//        std::cout << "Subsidiary_list_bcpl:" << std::endl; 
-//        for (unsigned i = 0; i < Subsidiary_list_bcpl.size(); i++) 
-//        {
-//          std::cout << Subsidiary_list_bcpl[i] << std::endl;
-//        }
-//        pause("Printed out Subsidiary_list_bcpl"); 
+//    // Output for artificial test.
+//    std::cout << "Subsidiary_list_bcpl:" << std::endl; 
+//    for (unsigned i = 0; i < Subsidiary_list_bcpl.size(); i++) 
+//    {
+//      std::cout << Subsidiary_list_bcpl[i] << std::endl;
+//    }
+//    // With the artificial test data, this should output:
+//    // 0, 1, 2, 4, 5, 6, 9, 10, 11, 3
+//    pause("Printed out Subsidiary_list_bcpl"); 
 
     // The ns_dof_list will ensure that the NS preconditioner have the 
     // structure:
     // 0  1  2  3  4  5  6
     // ub vb up vp ut vt p
+    // RAYTIME
+    double t_start_turn_into_subsidairy = TimingHelpers::timer();
+    
     navier_stokes_block_preconditioner_pt
-        ->turn_into_subsidiary_block_preconditioner(this, Subsidiary_list_bcpl,
-            subsidiary_dof_type_coarsening_map);
+      ->turn_into_subsidiary_block_preconditioner(
+          this, Subsidiary_list_bcpl, subsidiary_dof_type_coarsening_map);
+    // RAYTIME
+    double t_end_turn_into_subsidairy = TimingHelpers::timer();
+      //pause("Lgr: Done turn_into_sub..."); 
+    double t_turn_into_sub = t_end_turn_into_subsidairy - t_start_turn_into_subsidairy;
+    oomph_info << "LGR: turn_into_subsidairy: " << t_turn_into_sub << std::endl;
+    //    pause("After turn_into..."); 
+
 
     // Set the replacement blocks.
     //
